@@ -86,19 +86,19 @@ uint8_t * app_data_get_input_data (
    inputdata[0] = counter;
    if (button_pressed)
    {
-      // 0x80 = 1 0 0 0 | 0 0 0 0 => tieni solo MSB del byte
+      // 0x80 = 1 0 0 0 | 0 0 0 0 => in OR => forza a 1 l'MSB del byte e tutti gli altri li lascia invariati
       inputdata[0] |= 0x80;
    }
    else
    {
-      // 0x7F = 0 1 1 1 | 1 1 1 1 => tieni tutto tranne MSB del byte (lowest 7 bits)
+      // 0x7F = 0 1 1 1 | 1 1 1 1 => in AND => forza a 0 l'MSB del byte e tutti gli altri li lascia invariati
       inputdata[0] &= 0x7F;
    }
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;
 
-   APP_LOG_DEBUG ("***  app_data_get_input_data. counter %d %d\n", counter, inputdata[0]);
+   APP_LOG_DEBUG ("* app_data_get_input_data. counter %d %x. Button pressed? %d\n", counter, inputdata[0], button_pressed);
    // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, inputdata, APP_GSDML_INPUT_DATA_SIZE);
 
    return inputdata;
