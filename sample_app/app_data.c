@@ -79,21 +79,27 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   /* Prepare input data
+   /* Prepare input data.
+    * counter is uint8_t, corresponding to a char, that is one single byte [0; 255]
     * Lowest 7 bits: Counter    Most significant bit: Button
     */
    inputdata[0] = counter;
    if (button_pressed)
    {
+      // 0x80 = 1 0 0 0 | 0 0 0 0 => tieni solo MSB del byte
       inputdata[0] |= 0x80;
    }
    else
    {
+      // 0x7F = 0 1 1 1 | 1 1 1 1 => tieni tutto tranne MSB del byte (lowest 7 bits)
       inputdata[0] &= 0x7F;
    }
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;
+
+   APP_LOG_DEBUG ("***  app_data_get_input_data. counter %d %d\n", counter, inputdata[0]);
+   // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, inputdata, APP_GSDML_INPUT_DATA_SIZE);
 
    return inputdata;
 }
@@ -113,6 +119,10 @@ int app_data_set_output_data (
       {
          memcpy (outputdata, data, size);
          led_state = (outputdata[0] & 0x80) > 0;
+         /*
+            outputdata comes from Codesys PNIO mapped OUTPUTS!
+         */
+         app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
          app_handle_data_led_state (led_state);
          return 0;
       }

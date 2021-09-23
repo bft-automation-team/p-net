@@ -39,13 +39,13 @@ extern "C" {
 
 #define APP_GSDML_API 0
 
-#define APP_GSDML_DEFAULT_STATION_NAME "rt-labs-dev"
+#define APP_GSDML_DEFAULT_STATION_NAME "bft-pnet-device"
 
 /* GSDML tag: VendorID */
 #define APP_GSDML_VENDOR_ID 0xfeed
 
 /* GSDML tag: DeviceID */
-#define APP_GSDML_DEVICE_ID 0xbeef
+#define APP_GSDML_DEVICE_ID 0xff01
 
 /* Allowed: 'V', 'R', 'P', 'U', 'T' */
 #define APP_GSDML_SW_REV_PREFIX     'V'
@@ -57,7 +57,7 @@ extern "C" {
    (PNET_SUPPORTED_IM1 | PNET_SUPPORTED_IM2 | PNET_SUPPORTED_IM3)
 
 /* GSDML tag: OrderNumber */
-#define APP_GSDML_ORDER_ID "12345 Abcdefghijk"
+#define APP_GSDML_ORDER_ID "1"
 /* GSDML tag: ModuleInfo / Name */
 #define APP_GSDML_PRODUCT_NAME "P-Net Sample Application"
 
@@ -109,8 +109,8 @@ typedef struct
 #define APP_GSDML_SUBMOD_ID_DIGITAL_OUT     0x00000131
 #define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000132
 
-#define APP_GSDML_INPUT_DATA_SIZE   1 /* bytes, for digital inputs data */
-#define APP_GSDML_OUTPUT_DATA_SIZE  1 /* bytes, for digital outputs data */
+#define APP_GSDML_INPUT_DATA_SIZE   3 /* bytes, for digital inputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE  3 /* bytes, for digital outputs data */
 #define APP_GSDM_ALARM_PAYLOAD_SIZE 1 /* bytes */
 
 /**
