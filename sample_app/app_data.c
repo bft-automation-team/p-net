@@ -79,6 +79,12 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
+   APP_LOG_DEBUG ("* app_data_get_input_data. size %d\n", *size);
+   // APP_LOG_DEBUG ("* app_data_get_input_data. size %x\n", size);
+   // APP_LOG_DEBUG ("* app_data_get_input_data. counter %d\n", counter);
+   APP_LOG_DEBUG ("* app_data_get_input_data. Button pressed %d\n", button_pressed);
+   // APP_LOG_DEBUG ("* app_data_get_input_data. inputdata %x.\n", inputdata[0]);
+
    /* Prepare input data.
     * counter is uint8_t, corresponding to a char, that is one single byte [0; 255]
     * Lowest 7 bits: Counter    Most significant bit: Button
@@ -98,7 +104,7 @@ uint8_t * app_data_get_input_data (
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;
 
-   APP_LOG_DEBUG ("* app_data_get_input_data. counter %d %x. Button pressed? %d\n", counter, inputdata[0], button_pressed);
+   // APP_LOG_DEBUG ("* app_data_get_input_data. counter %d %x. Button pressed? %d\n", counter, inputdata[0], button_pressed);
    // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, inputdata, APP_GSDML_INPUT_DATA_SIZE);
 
    return inputdata;
@@ -117,12 +123,13 @@ int app_data_set_output_data (
          submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_OUT ||
          submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT)
       {
+         // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
          memcpy (outputdata, data, size);
          led_state = (outputdata[0] & 0x80) > 0;
          /*
             outputdata comes from Codesys PNIO mapped OUTPUTS!
          */
-         app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
+         // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
          app_handle_data_led_state (led_state);
          return 0;
       }

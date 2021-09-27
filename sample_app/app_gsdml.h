@@ -73,8 +73,8 @@ extern "C" {
 #define APP_GSDML_LOGBOOK_ERROR_CODE_2 0x00       /* Manufacturer specific */
 #define APP_GSDML_LOGBOOK_ENTRY_DETAIL 0xFEE1DEAD /* Manufacturer specific */
 
-#define APP_GSDM_PARAMETER_1_IDX  123
-#define APP_GSDM_PARAMETER_2_IDX  124
+#define APP_GSDM_PARAMETER_1_IDX  1
+#define APP_GSDM_PARAMETER_2_IDX  2
 #define APP_GSDM_PARAMETER_LENGTH 4
 
 typedef struct cfg_module
@@ -104,14 +104,27 @@ typedef struct
 
 #define APP_GSDML_MOD_ID_8_0_DIGITAL_IN     0x00000030
 #define APP_GSDML_MOD_ID_0_8_DIGITAL_OUT    0x00000031
-#define APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT 0x00000032
+#define APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT 0x00000033
+// #define APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT 0x00000033
 #define APP_GSDML_SUBMOD_ID_DIGITAL_IN      0x00000130
 #define APP_GSDML_SUBMOD_ID_DIGITAL_OUT     0x00000131
-#define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000132
+#define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000133
+// #define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000133
 
-#define APP_GSDML_INPUT_DATA_SIZE   3 /* bytes, for digital inputs data */
-#define APP_GSDML_OUTPUT_DATA_SIZE  3 /* bytes, for digital outputs data */
-#define APP_GSDM_ALARM_PAYLOAD_SIZE 1 /* bytes */
+// #define APP_GSDML_INPUT_DATA_SIZE_BIT       2 /* bytes, for digital inputs data */
+// #define APP_GSDML_INPUT_DATA_SIZE_ANALOG    (16 * 2) /* bytes, for analog inputs data */
+// #define APP_GSDML_INPUT_DATA_SIZE           (APP_GSDML_INPUT_DATA_SIZE_BIT + APP_GSDML_INPUT_DATA_SIZE_ANALOG) /* total bytes, for inputs data */
+// #define APP_GSDML_OUTPUT_DATA_SIZE_BIT      2 /* bytes, for digital outputs data */
+// #define APP_GSDML_OUTPUT_DATA_SIZE_ANALOG   (16 * 2) /* bytes, for analog outputs data */
+// #define APP_GSDML_OUTPUT_DATA_SIZE          (APP_GSDML_OUTPUT_DATA_SIZE_BIT + APP_GSDML_OUTPUT_DATA_SIZE_ANALOG) /* total bytes, for outputs data */
+#define APP_GSDML_INPUT_DATA_SIZE_BIT       2 /* bytes, for digital inputs data */
+#define APP_GSDML_INPUT_DATA_SIZE_ANALOG    (16 * 2) /* bytes, for analog inputs data */
+#define APP_GSDML_INPUT_DATA_SIZE           (APP_GSDML_INPUT_DATA_SIZE_BIT + APP_GSDML_INPUT_DATA_SIZE_ANALOG) /* total bytes, for inputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE_BIT      2 /* bytes, for digital outputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE_ANALOG   (3 * 2) /* bytes, for analog outputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE          (APP_GSDML_OUTPUT_DATA_SIZE_BIT + APP_GSDML_OUTPUT_DATA_SIZE_ANALOG) /* total bytes, for outputs data */
+
+#define APP_GSDM_ALARM_PAYLOAD_SIZE         1 /* bytes */
 
 /**
  * Get module configuration from module id
