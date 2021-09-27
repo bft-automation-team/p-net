@@ -399,33 +399,37 @@ void pf_cmina_dcp_set_commit (pnet_t * net)
       pf_cmina_ip_to_string (
          net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_gateway,
          gateway_string);
+      // LOG_DEBUG (
+      //    PF_DCP_LOG,
+      //    "CMINA(%d): Setting IP: %s Netmask: %s Gateway: %s Station name: "
+      //    "\"%s\" "
+      //    "Permanent: %u\n",
+      //    __LINE__,
+      //    ip_string,
+      //    netmask_string,
+      //    gateway_string,
+      //    net->cmina_current_dcp_ase.station_name,
+      //    permanent);
+
       LOG_DEBUG (
          PF_DCP_LOG,
-         "CMINA(%d): Setting IP: %s Netmask: %s Gateway: %s Station name: "
-         "\"%s\" "
-         "Permanent: %u\n",
-         __LINE__,
-         ip_string,
-         netmask_string,
-         gateway_string,
-         net->cmina_current_dcp_ase.station_name,
-         permanent);
-
+         "CMINA(%d): NOT FORCING ANY IP ADDRESS. PLEXUS IP MUST NOT BE OVERRIDDEN.\n",
+         __LINE__);
       net->cmina_commit_ip_suite = false;
-      res = pnal_set_ip_suite (
-         net->pf_interface.main_port.name,
-         &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_addr,
-         &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_mask,
-         &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_gateway,
-         net->cmina_current_dcp_ase.station_name,
-         permanent);
-      if (res != 0)
-      {
-         LOG_ERROR (
-            PF_DCP_LOG,
-            "CMINA(%d): Failed to set network parameters\n",
-            __LINE__);
-      }
+      // res = pnal_set_ip_suite (
+      //    net->pf_interface.main_port.name,
+      //    &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_addr,
+      //    &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_mask,
+      //    &net->cmina_current_dcp_ase.full_ip_suite.ip_suite.ip_gateway,
+      //    net->cmina_current_dcp_ase.station_name,
+      //    permanent);
+      // if (res != 0)
+      // {
+      //    LOG_ERROR (
+      //       PF_DCP_LOG,
+      //       "CMINA(%d): Failed to set network parameters\n",
+      //       __LINE__);
+      // }
    }
 }
 
