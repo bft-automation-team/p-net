@@ -42,7 +42,7 @@ Altri parametri sono per gestire input da file e output su file.
 
 ```
 # sudo /home/plexus/profinet/build/pn_dev -vvvvv -i enp2s0
-sudo /home/plexus/profinet/build/pn_dev -vvvvv -i enp2s0 -b /home/plexus/pnet_button_1.txt -d /home/plexus/pnet_button_2.txt
+sudo /home/plexus/profinet/build/pn_dev -vvvvv -i enp2s0 -b /home/plexus/profinet/pnet_button_1.txt -d /home/plexus/profinet/pnet_button_2.txt
 ```
 
 ## Reset vecchia configurazione
@@ -71,6 +71,13 @@ watch -n 0.1 cat pnet_led_2.txt
 Impostare valori di input (fake buttons I/O acceso spento)
 
 ```
-echo 0 > /home/plexus/pnet_button_1.txt
-echo 1 > /home/plexus/pnet_button_1.txt
+echo 0 > /home/plexus/profinet/pnet_button_1.txt
+echo 1 > /home/plexus/profinet/pnet_button_1.txt
+```
+
+Simulare allarme (fake buttons I/O acceso spento)
+
+```
+echo 0 > /home/plexus/profinet/pnet_button_2.txt
+echo 1 > /home/plexus/profinet/pnet_button_2.txt
 ```

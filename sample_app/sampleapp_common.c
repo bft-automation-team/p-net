@@ -92,6 +92,8 @@ typedef struct app_data_t
    bool button1_pressed;
    bool button2_pressed;
    bool button2_pressed_previous;
+   uint16_t digital_inputs;
+   uint16_t * analog_inputs;
 
    /* Counters used to control when buttons are checked
     * and process data is updated
@@ -1469,6 +1471,16 @@ static void update_button_states (app_data_t * app)
    }
 }
 
+static void update_digital_input_states (app_data_t * app)
+{
+   app->buttons_tick_counter++;
+   if (app->buttons_tick_counter > APP_TICKS_READ_BUTTONS)
+   {
+      app->digital_inputs = app_get_digital_inputs ();
+      app->buttons_tick_counter = 0;
+   }
+}
+
 void app_loop_forever (void * arg)
 {
    app_data_t * app = (app_data_t *)arg;
@@ -1506,6 +1518,8 @@ void app_loop_forever (void * arg)
          os_event_clr (app->main_events, APP_EVENT_TIMER);
 
          update_button_states (app);
+         update_digital_input_states (app);
+         APP_LOG_INFO ("Digital input read %x\n", app->digital_inputs);
          if (app->main_api.arep != UINT32_MAX)
          {
             app_handle_cyclic_data (app);

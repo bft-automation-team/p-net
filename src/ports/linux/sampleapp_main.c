@@ -269,6 +269,48 @@ bool app_get_button (uint16_t id)
    return false;
 }
 
+/**
+ * Read a set of boolean values as uint16_t from a file
+ *
+ * @param filepath      In: Path to file
+ * @return the value
+ */
+uint16_t read_digital_inputs_as_uint16_t_from_file (const char * filepath)
+{
+   FILE * fp;
+   uint16_t value = 0;
+   int eof_indicator;
+
+   fp = fopen (filepath, "r");
+   if (fp == NULL)
+   {
+      return false;
+   }
+
+   int rv = fscanf(fp, "%hu", &value);
+   eof_indicator = feof (fp);
+   fclose (fp);
+
+   // if (rv != 1)
+   // {
+   //    return 0;
+   // }
+   if (eof_indicator)
+   {
+      return 0;
+   }
+   return value;
+}
+
+uint16_t app_get_digital_inputs ()
+{
+   if (app_args.path_digital_inputs[0] != '\0')
+   {
+      return read_digital_inputs_as_uint16_t_from_file (app_args.path_digital_inputs);
+   }
+   return 0;
+}
+
 void app_set_led (uint16_t id, bool led_state)
 {
    /* Important:

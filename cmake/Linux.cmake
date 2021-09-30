@@ -90,6 +90,8 @@ target_compile_options(pn_dev
   -ffunction-sections
   -fdata-sections
   -fno-stack-protector
+  -Wno-unused-variable
+  -Wno-unused-but-set-variable
   )
 
 target_link_options(pn_dev

@@ -52,6 +52,7 @@ typedef struct app_args
    int show;
    bool factory_reset;
    bool remove_files;
+   char path_digital_inputs[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
 } app_args_t;
 
 typedef enum
@@ -133,6 +134,16 @@ void app_set_led (uint16_t id, bool led_state);
  * @return  true if button is pressed, false if not
  */
 bool app_get_button (uint16_t id);
+
+/**
+ * Read digital inputs state
+ *
+ * Hardware specific. Implemented in sample app main file for
+ * each supported platform.
+ *
+ * @return  value of 16 bits as an uint16_t
+ */
+uint16_t app_get_digital_inputs ();
 
 #ifdef __cplusplus
 }
