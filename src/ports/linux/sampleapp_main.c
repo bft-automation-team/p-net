@@ -143,7 +143,7 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
    output_arguments.factory_reset = false;
    output_arguments.remove_files = false;
 
-   while ((option = getopt (argc, argv, "hvgfri:s:b:d:p:")) != -1)
+   while ((option = getopt (argc, argv, "hvgfri:s:b:d:p:x:")) != -1)
    {
       switch (option)
       {
@@ -177,6 +177,14 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
             exit (EXIT_FAILURE);
          }
          strcpy (output_arguments.path_button1, optarg);
+         break;
+      case 'x':
+         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
+         {
+            printf ("Error: The argument to -x is too long.\n");
+            exit (EXIT_FAILURE);
+         }
+         strcpy (output_arguments.path_digital_inputs, optarg);
          break;
       case 'd':
          if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)

@@ -7,7 +7,7 @@ Per fare la build, muoversi nella cartella parent /profinet e lanciare il comand
 La build si troverà nella sottocartella /profinet/build
 
 ```
-cd /home/plexus/profinet
+cd /home/automation-dell/profinet
 cmake --build build --target install
 ```
 
@@ -41,8 +41,9 @@ La "i" indica l'interfaccia di rete da utilizzare sulla quale aspettarsi una ric
 Altri parametri sono per gestire input da file e output su file.
 
 ```
-# sudo /home/plexus/profinet/build/pn_dev -vvvvv -i enp2s0
-sudo /home/plexus/profinet/build/pn_dev -vvvvv -i enp2s0 -b /home/plexus/profinet/pnet_button_1.txt -d /home/plexus/profinet/pnet_button_2.txt
+# sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0
+sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0 -b /home/automation-dell/profinet/pnet_button_1.txt -d /home/automation-dell/profinet/pnet_button_2.txt
+sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0 -b /home/automation-dell/profinet/pnet_button_1.txt -d /home/automation-dell/profinet/pnet_button_2.txt -x /home/automation-dell/profinet/pnet_digital_inputs_16.txt
 ```
 
 ## Reset vecchia configurazione
@@ -54,7 +55,7 @@ Questa cosa si fa col parametro "r".
 Di seguito, un esempio di reset + settaggio IP e submask per l'interfaccia da usare.
 
 ```
-sudo /home/plexus/profinet/build/pn_dev -r
+sudo /home/automation-dell/profinet/build/pn_dev -r
 sudo ifconfig enp2s0 169.254.206.121 netmask 255.255.0.0 up
 ```
 
@@ -71,13 +72,19 @@ watch -n 0.1 cat pnet_led_2.txt
 Impostare valori di input (fake buttons I/O acceso spento)
 
 ```
-echo 0 > /home/plexus/profinet/pnet_button_1.txt
-echo 1 > /home/plexus/profinet/pnet_button_1.txt
+echo 0 > /home/automation-dell/profinet/pnet_button_1.txt
+echo 1 > /home/automation-dell/profinet/pnet_button_1.txt
 ```
 
 Simulare allarme (fake buttons I/O acceso spento)
 
 ```
-echo 0 > /home/plexus/profinet/pnet_button_2.txt
-echo 1 > /home/plexus/profinet/pnet_button_2.txt
+echo 0 > /home/automation-dell/profinet/pnet_button_2.txt
+echo 1 > /home/automation-dell/profinet/pnet_button_2.txt
+```
+
+Impostare valori digitali di input
+
+```
+echo 1010101010101010 > /home/automation-dell/profinet/pnet_digital_inputs_16.txt
 ```

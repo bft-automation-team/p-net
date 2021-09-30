@@ -61,6 +61,7 @@ extern "C" {
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
    bool button_state,
+   uint16_t digital_inputs,
    uint8_t counter,
    uint16_t * size,
    uint8_t * iops);

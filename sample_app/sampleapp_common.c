@@ -939,6 +939,7 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
       indata = app_data_get_input_data (
          subslot->submodule_id,
          app->button1_pressed,
+         app->digital_inputs,
          app->counter_data,
          &indata_size,
          &iops);
@@ -1053,6 +1054,7 @@ static int app_set_initial_data_and_ioxs (app_data_t * app)
                   indata = app_data_get_input_data (
                      p_subslot->submodule_id,
                      app->button1_pressed,
+                     app->digital_inputs,
                      app->counter_data,
                      &indata_size,
                      &iops);
@@ -1519,7 +1521,7 @@ void app_loop_forever (void * arg)
 
          update_button_states (app);
          update_digital_input_states (app);
-         APP_LOG_INFO ("Digital input read %x\n", app->digital_inputs);
+         // APP_LOG_INFO ("Digital input read %x %d\n", app->digital_inputs, app->digital_inputs);
          if (app->main_api.arep != UINT32_MAX)
          {
             app_handle_cyclic_data (app);

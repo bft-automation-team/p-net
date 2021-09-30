@@ -61,6 +61,7 @@ static void app_handle_data_led_state (bool led_state)
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
    bool button_pressed,
+   uint16_t digital_inputs,
    uint8_t counter,
    uint16_t * size,
    uint8_t * iops)
@@ -79,11 +80,13 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   APP_LOG_DEBUG ("* app_data_get_input_data. size %d\n", *size);
-   // APP_LOG_DEBUG ("* app_data_get_input_data. size %x\n", size);
-   // APP_LOG_DEBUG ("* app_data_get_input_data. counter %d\n", counter);
-   APP_LOG_DEBUG ("* app_data_get_input_data. Button pressed %d\n", button_pressed);
-   // APP_LOG_DEBUG ("* app_data_get_input_data. inputdata %x.\n", inputdata[0]);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => size %d\n", *size);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => size %x\n", size);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => counter %d\n", counter);
+   APP_LOG_DEBUG ("* app_data_get_input_data => Button pressed %d\n", button_pressed);
+   APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
+      BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata %x.\n", inputdata[0]);
 
    /* Prepare input data.
     * counter is uint8_t, corresponding to a char, that is one single byte [0; 255]
