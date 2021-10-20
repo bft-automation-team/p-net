@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -286,27 +287,32 @@ bool app_get_button (uint16_t id)
 uint16_t read_digital_inputs_as_uint16_t_from_file (const char * filepath)
 {
    FILE * fp;
+   char * line = NULL;
+   size_t len = 0;
+   ssize_t read;
    uint16_t value = 0;
-   int eof_indicator;
 
-   fp = fopen (filepath, "r");
+   fp = fopen(filepath, "r");
    if (fp == NULL)
    {
       return false;
    }
 
-   int rv = fscanf(fp, "%hu", &value);
-   eof_indicator = feof (fp);
-   fclose (fp);
-
-   // if (rv != 1)
-   // {
-   //    return 0;
-   // }
-   if (eof_indicator)
-   {
-      return 0;
+   if ((read = getline(&line, &len, fp)) != -1) {
+      // printf("Digital inputs %s ", line);
+      for (int i = 0; i < 16; i++) {
+         // ASCII char value: subtracting '0' shifts digit ASCII values to decimal values. b will be 0 or 1.
+         uint8_t b = line[i] - '0';
+         if (b == 1) {
+            value += pow(2, 15-i);
+         }
+      }
    }
+   
+   fclose (fp);
+   if (line)
+      free(line);
+   
    return value;
 }
 

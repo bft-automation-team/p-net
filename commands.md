@@ -56,7 +56,7 @@ Di seguito, un esempio di reset + settaggio IP e submask per l'interfaccia da us
 
 ```
 sudo /home/automation-dell/profinet/build/pn_dev -r
-sudo ifconfig enp2s0 169.254.206.121 netmask 255.255.0.0 up
+sudo ifconfig enp7s0 169.254.206.121 netmask 255.255.0.0 up
 ```
 
 
