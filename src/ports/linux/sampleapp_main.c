@@ -298,14 +298,23 @@ uint16_t read_digital_inputs_as_uint16_t_from_file (const char * filepath)
       return false;
    }
 
-   if ((read = getline(&line, &len, fp)) != -1) {
-      // printf("Digital inputs %s ", line);
-      for (int i = 0; i < 16; i++) {
-         // ASCII char value: subtracting '0' shifts digit ASCII values to decimal values. b will be 0 or 1.
-         uint8_t b = line[i] - '0';
-         if (b == 1) {
-            value += pow(2, 15-i);
-         }
+   read = getline(&line, &len, fp);
+   if (read == -1) {
+      APP_LOG_ERROR ("! Error in reading digital inputs file\n");
+      printf("Error in reading digital inputs file");
+      return value;
+   }
+
+   read--;
+   if (read != 16) {
+      APP_LOG_ERROR ("! Digital inputs file contains an unexpected number of bits: %lu \n", read);
+      printf("Digital inputs file contains an unexpected number of bits: %lu \n", read);
+      return value;
+   }
+
+   for (int i = 0; i < read; i++) {
+      if (line[i] == '1') {
+         value += pow(2, 15-i);
       }
    }
    
