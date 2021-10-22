@@ -79,8 +79,8 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
-      BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
+   //    BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
 
    /* Prepare input data.
     * Most 2 significant bytes: Digital inputs (16 bits)
@@ -92,6 +92,8 @@ uint8_t * app_data_get_input_data (
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
       inputdata[2 + (i*2)] = (analog_inputs[i] >> 8);
       inputdata[2 + (i*2) + 1] = analog_inputs[i] & 0xFF;
+      // APP_LOG_DEBUG ("* app_data_get_input_data => Analog input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", i,
+      //    BYTE_TO_BINARY(analog_inputs[i]>>8), BYTE_TO_BINARY(analog_inputs[i]), analog_inputs[i]);
    }
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);

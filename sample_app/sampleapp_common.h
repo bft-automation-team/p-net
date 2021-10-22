@@ -36,8 +36,8 @@ extern "C" {
 #define APP_DATA_LED_ID            1
 #define APP_PROFINET_SIGNAL_LED_ID 2
 
-#define APP_TICKS_READ_BUTTONS 10
-#define APP_TICKS_UPDATE_DATA  100
+#define APP_TICKS_READ_BUTTONS 250     // 10
+#define APP_TICKS_UPDATE_DATA  250     // 100
 
 typedef struct app_args
 {

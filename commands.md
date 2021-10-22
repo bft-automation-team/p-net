@@ -11,6 +11,10 @@ cd /home/automation-dell/profinet
 cmake --build build --target install
 ```
 
+Se si vuole cambiare la frequenza di aggiornamento di lettura/scrittura dei file (in pratica, accorci o allunghi il ciclo di esecuzione del main), agire su simple_app_common.h
+- APP_TICKS_READ_BUTTONS
+- APP_TICKS_UPDATE_DATA
+
 ## CONFIGURARE LA BUILD
 
 Va fatto solo se necessario, per cambiare i parametri della build stessa.
@@ -60,29 +64,8 @@ sudo ifconfig enp7s0 169.254.206.121 netmask 255.255.0.0 up
 
 ## TESTARE FUNZIONAMENTO I/O
 
-Tenere monitorati gli output (fake LEDs I/O acceso spento)
+Impostare valori di input
 
 ```
-watch -n 0.1 cat pnet_led_1.txt
-watch -n 0.1 cat pnet_led_2.txt
-```
-
-Impostare valori di input (fake buttons I/O acceso spento)
-
-```
-echo 0 > /home/automation-dell/profinet/pnet_button_1.txt
-echo 1 > /home/automation-dell/profinet/pnet_button_1.txt
-```
-
-Simulare allarme (fake buttons I/O acceso spento)
-
-```
-echo 0 > /home/automation-dell/profinet/pnet_button_2.txt
-echo 1 > /home/automation-dell/profinet/pnet_button_2.txt
-```
-
-Impostare valori digitali di input
-
-```
-echo 1010101010101010 > /home/automation-dell/profinet/pnet_digital_inputs_16.txt
+echo 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32 > /home/automation-dell/profinet/plexus_outputs_as_profinet_inputs.txt
 ```
