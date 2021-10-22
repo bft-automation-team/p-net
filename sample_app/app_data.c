@@ -58,6 +58,13 @@ static void app_handle_data_led_state (bool led_state)
    previous_led_state = led_state;
 }
 
+unsigned char reverse_byte(unsigned char b) {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+   return b;
+}
+
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
    uint16_t digital_inputs,
@@ -86,9 +93,9 @@ uint8_t * app_data_get_input_data (
     * Most 2 significant bytes: Digital inputs (16 bits)
     * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
-   // conversion from original data type to bytes, for communication
-   inputdata[0] = (digital_inputs >> 8);
-   inputdata[1] = digital_inputs & 0xFF;
+   // conversion from original data type to bytes, for communication   
+   inputdata[0] = reverse_byte(digital_inputs & 0xFF);
+   inputdata[1] = reverse_byte(digital_inputs >> 8);
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
       inputdata[2 + (i*2)] = (analog_inputs[i] >> 8);
       inputdata[2 + (i*2) + 1] = analog_inputs[i] & 0xFF;
