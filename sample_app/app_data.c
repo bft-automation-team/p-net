@@ -80,35 +80,31 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   // APP_LOG_DEBUG ("* app_data_get_input_data => size %d\n", *size);
-   // APP_LOG_DEBUG ("* app_data_get_input_data => size %x\n", size);
-   // APP_LOG_DEBUG ("* app_data_get_input_data => counter %d\n", counter);
-   APP_LOG_DEBUG ("* app_data_get_input_data => Button pressed %d\n", button_pressed);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => Button pressed %d\n", button_pressed);
    APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
       BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
-   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata %x.\n", inputdata[0]);
 
    /* Prepare input data.
-    * counter is uint8_t, corresponding to a char, that is one single byte [0; 255]
-    * Lowest 7 bits: Counter    Most significant bit: Button
+    * Most 2 significant bytes: Digital inputs (16 bits)
+    * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
-   inputdata[0] = counter;
-   if (button_pressed)
-   {
-      // 0x80 = 1 0 0 0 | 0 0 0 0 => in OR => forza a 1 l'MSB del byte e tutti gli altri li lascia invariati
-      inputdata[0] |= 0x80;
-   }
-   else
-   {
-      // 0x7F = 0 1 1 1 | 1 1 1 1 => in AND => forza a 0 l'MSB del byte e tutti gli altri li lascia invariati
-      inputdata[0] &= 0x7F;
-   }
+   // APP_LOG_DEBUG ("* app_data_get_input_data => digital_inputs %d\n", digital_inputs);
+   inputdata[0] = (digital_inputs >> 8);
+   inputdata[1] = digital_inputs & 0xFF;
+   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
+   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);
+   // inputdata[0] = counter;
+   // if (button_pressed)
+   // {
+   //    inputdata[0] |= 0x80;
+   // }
+   // else
+   // {
+   //    inputdata[0] &= 0x7F;
+   // }
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;
-
-   // APP_LOG_DEBUG ("* app_data_get_input_data. counter %d %x. Button pressed? %d\n", counter, inputdata[0], button_pressed);
-   // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, inputdata, APP_GSDML_INPUT_DATA_SIZE);
 
    return inputdata;
 }
