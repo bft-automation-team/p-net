@@ -397,35 +397,32 @@ void read_analog_inputs_from_file (const char * filepath, uint16_t * return_valu
       return;
    }
 
+   line += (APP_GSDML_INPUT_DATA_SIZE_BIT * 8 * 2);  // substring of digital portion
    char *end = line;
    uint8_t comma_counter = 0;
-   APP_LOG_ERROR ("! Read line: %s", line);
+   // APP_LOG_ERROR ("! Read line, analog values: %s", line);
 
 	while(*end) {
-		int n = strtol(line, &end, 10);
-      comma_counter++;
-      end++;
+		uint8_t n = strtoul(line, &end, 10);
+		while (*end == ',') {
+			end++;
+		}
 
-      if (comma_counter > (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2)) {
-         uint16_t current_value = atoi(line);
-         return_values[read_values_count] = current_value;
-         read_values_count++;
-      }
-      if (comma_counter == APP_GSDML_INPUT_DATA_SIZE_BIT * 8 + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2 - 1) {
+      return_values[read_values_count] = n;
+      read_values_count++;
+      line = end;
+
+      if (*end == '\0' || *end == '\n') {
          break;
       }
-
-		line = end;
 	}
 
    if (read_values_count != (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2)) {
-      APP_LOG_ERROR ("! Analog inputs file contains less values than expected: %d", read_values_count);
+      APP_LOG_ERROR ("! Analog inputs file contains less values than expected: %d\n", read_values_count);
       return;
    }
    
    fclose (fp);
-   if (line)
-      free(line);
 }
 
 void app_get_analog_inputs (uint16_t * return_values)
@@ -433,6 +430,28 @@ void app_get_analog_inputs (uint16_t * return_values)
    if (app_args.path_inputs_from_plexus[0] != '\0')
    {
       read_analog_inputs_from_file (app_args.path_inputs_from_plexus, return_values);
+   }
+}
+
+void write_heartbeat_to_file (const char * filepath)
+{
+   FILE *fp = fopen(filepath, "w");
+
+   if (fp == NULL)
+   {
+      APP_LOG_ERROR("! Error opening file!\n");
+      return;
+   }
+
+   fprintf(fp, "%u\n", (unsigned)time(NULL));
+   fclose(fp);
+}
+
+void update_heartbeat ()
+{
+   if (app_args.path_heartbeat[0] != '\0')
+   {
+      write_heartbeat_to_file (app_args.path_heartbeat);
    }
 }
 

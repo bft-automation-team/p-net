@@ -1511,6 +1511,7 @@ void app_loop_forever (void * arg)
          {
             update_digital_input_states (app);
             update_analog_input_states (app);
+            update_heartbeat ();
             app->read_inputs_tick_counter = 0;
          }
          

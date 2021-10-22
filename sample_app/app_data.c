@@ -79,7 +79,6 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   // APP_LOG_DEBUG ("* app_data_get_input_data => Button pressed %d\n", button_pressed);
    APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
       BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
 
@@ -87,7 +86,7 @@ uint8_t * app_data_get_input_data (
     * Most 2 significant bytes: Digital inputs (16 bits)
     * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
-   // APP_LOG_DEBUG ("* app_data_get_input_data => digital_inputs %d\n", digital_inputs);
+   // conversion from original data type to bytes, for communication
    inputdata[0] = (digital_inputs >> 8);
    inputdata[1] = digital_inputs & 0xFF;
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
@@ -96,9 +95,6 @@ uint8_t * app_data_get_input_data (
    }
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);
-
-   // conversion from original data type to bytes, for communication
-   // APP_LOG_DEBUG ("* app_data_get_input_data => analog_inputs %d\n", inputdata[0]);
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;

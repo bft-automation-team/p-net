@@ -154,6 +154,11 @@ uint16_t app_get_digital_inputs ();
  */
 void app_get_analog_inputs (uint16_t * return_values);
 
+/**
+ * Writes current timestamp on a file.
+ */
+void update_heartbeat ();
+
 #ifdef __cplusplus
 }
 #endif
