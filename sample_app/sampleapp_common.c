@@ -93,12 +93,12 @@ typedef struct app_data_t
    bool button2_pressed;
    bool button2_pressed_previous;
    uint16_t digital_inputs;
-   uint16_t * analog_inputs;
+   uint16_t analog_inputs[APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
 
    /* Counters used to control when buttons are checked
     * and process data is updated
     */
-   uint32_t buttons_tick_counter;
+   uint32_t read_inputs_tick_counter;
    uint32_t process_data_tick_counter;
 
    /* Counter value part of process data */
@@ -938,9 +938,8 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
        */
       indata = app_data_get_input_data (
          subslot->submodule_id,
-         app->button1_pressed,
          app->digital_inputs,
-         app->counter_data,
+         app->analog_inputs,
          &indata_size,
          &iops);
 
@@ -1053,9 +1052,8 @@ static int app_set_initial_data_and_ioxs (app_data_t * app)
                {
                   indata = app_data_get_input_data (
                      p_subslot->submodule_id,
-                     app->button1_pressed,
                      app->digital_inputs,
-                     app->counter_data,
+                     app->analog_inputs,
                      &indata_size,
                      &iops);
                }
@@ -1464,23 +1462,18 @@ void app_pnet_cfg_init_default (pnet_cfg_t * pnet_cfg)
 
 static void update_button_states (app_data_t * app)
 {
-   app->buttons_tick_counter++;
-   if (app->buttons_tick_counter > APP_TICKS_READ_BUTTONS)
-   {
-      app->button1_pressed = app_get_button (0);
-      app->button2_pressed = app_get_button (1);
-      app->buttons_tick_counter = 0;
-   }
+   app->button1_pressed = app_get_button (0);
+   app->button2_pressed = app_get_button (1);
 }
 
 static void update_digital_input_states (app_data_t * app)
 {
-   app->buttons_tick_counter++;
-   if (app->buttons_tick_counter > APP_TICKS_READ_BUTTONS)
-   {
-      app->digital_inputs = app_get_digital_inputs ();
-      app->buttons_tick_counter = 0;
-   }
+   app->digital_inputs = app_get_digital_inputs ();
+}
+
+static void update_analog_input_states (app_data_t * app)
+{
+   app_get_analog_inputs (app->analog_inputs);
 }
 
 void app_loop_forever (void * arg)
@@ -1519,9 +1512,15 @@ void app_loop_forever (void * arg)
       {
          os_event_clr (app->main_events, APP_EVENT_TIMER);
 
-         update_button_states (app);
-         update_digital_input_states (app);
-         // APP_LOG_INFO ("Digital input read %x %d\n", app->digital_inputs, app->digital_inputs);
+         app->read_inputs_tick_counter++;
+         if (app->read_inputs_tick_counter > APP_TICKS_READ_BUTTONS)
+         {
+            update_button_states (app);
+            update_digital_input_states (app);
+            update_analog_input_states (app);
+            app->read_inputs_tick_counter = 0;
+         }
+         
          if (app->main_api.arep != UINT32_MAX)
          {
             app_handle_cyclic_data (app);

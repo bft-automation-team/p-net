@@ -60,9 +60,8 @@ static void app_handle_data_led_state (bool led_state)
 
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
-   bool button_pressed,
    uint16_t digital_inputs,
-   uint8_t counter,
+   uint16_t * analog_inputs,
    uint16_t * size,
    uint8_t * iops)
 {
@@ -91,17 +90,15 @@ uint8_t * app_data_get_input_data (
    // APP_LOG_DEBUG ("* app_data_get_input_data => digital_inputs %d\n", digital_inputs);
    inputdata[0] = (digital_inputs >> 8);
    inputdata[1] = digital_inputs & 0xFF;
+   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
+      inputdata[2 + (i*2)] = (analog_inputs[i] >> 8);
+      inputdata[2 + (i*2) + 1] = analog_inputs[i] & 0xFF;
+   }
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);
-   // inputdata[0] = counter;
-   // if (button_pressed)
-   // {
-   //    inputdata[0] |= 0x80;
-   // }
-   // else
-   // {
-   //    inputdata[0] &= 0x7F;
-   // }
+
+   // conversion from original data type to bytes, for communication
+   // APP_LOG_DEBUG ("* app_data_get_input_data => analog_inputs %d\n", inputdata[0]);
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;

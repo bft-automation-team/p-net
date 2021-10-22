@@ -41,9 +41,7 @@ La "i" indica l'interfaccia di rete da utilizzare sulla quale aspettarsi una ric
 Altri parametri sono per gestire input da file e output su file.
 
 ```
-# sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0
-sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0 -b /home/automation-dell/profinet/pnet_button_1.txt -d /home/automation-dell/profinet/pnet_button_2.txt
-sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0 -b /home/automation-dell/profinet/pnet_button_1.txt -d /home/automation-dell/profinet/pnet_button_2.txt -x /home/automation-dell/profinet/pnet_digital_inputs_16.txt
+sudo /home/automation-dell/profinet/build/pn_dev -vvvvv -i enp7s0 -a /home/automation-dell/profinet/plexus_outputs_as_profinet_inputs.txt -b /home/automation-dell/profinet/heartbeat.txt
 ```
 
 ## Reset vecchia configurazione

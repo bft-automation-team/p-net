@@ -101,10 +101,10 @@ void show_usage()
       "   -s NAME      Set station name. Defaults to %s  Only used\n",
       APP_GSDML_DEFAULT_STATION_NAME);
    printf ("                if not already available in storage file.\n");
-   printf ("   -b FILE      Path (absolute or relative) to read Button1. "
-           "Defaults to not read Button1.\n");
-   printf ("   -d FILE      Path (absolute or relative) to read Button2. "
-           "Defaults to not read Button2.\n");
+   printf ("   -a FILE      Path (absolute or relative) to read Plexus outputs. "
+           "Defaults to not read Plexus outputs.\n");
+   printf ("   -b FILE      Path (absolute or relative) to write the Plexus heartbeat file. "
+           "Defaults to not write Plexus heartbeat file.\n");
    printf ("   -p PATH      Absolute path to storage directory. Defaults to "
            "use current directory.\n");
    printf ("\n");
@@ -144,10 +144,26 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
    output_arguments.factory_reset = false;
    output_arguments.remove_files = false;
 
-   while ((option = getopt (argc, argv, "hvgfri:s:b:d:p:x:")) != -1)
+   while ((option = getopt (argc, argv, "hvgfra:b:i:s:p:")) != -1)
    {
       switch (option)
       {
+      case 'a':
+         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
+         {
+            printf ("Error: The argument to -a is too long.\n");
+            exit (EXIT_FAILURE);
+         }
+         strcpy (output_arguments.path_digital_inputs, optarg);
+         break;
+      case 'b':
+         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
+         {
+            printf ("Error: The argument to -b is too long.\n");
+            exit (EXIT_FAILURE);
+         }
+         strcpy (output_arguments.path_button1, optarg);
+         break;
       case 'v':
          output_arguments.verbosity++;
          break;
@@ -170,30 +186,6 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
          break;
       case 's':
          strcpy (output_arguments.station_name, optarg);
-         break;
-      case 'b':
-         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
-         {
-            printf ("Error: The argument to -b is too long.\n");
-            exit (EXIT_FAILURE);
-         }
-         strcpy (output_arguments.path_button1, optarg);
-         break;
-      case 'x':
-         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
-         {
-            printf ("Error: The argument to -x is too long.\n");
-            exit (EXIT_FAILURE);
-         }
-         strcpy (output_arguments.path_digital_inputs, optarg);
-         break;
-      case 'd':
-         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
-         {
-            printf ("Error: The argument to -d is too long.\n");
-            exit (EXIT_FAILURE);
-         }
-         strcpy (output_arguments.path_button2, optarg);
          break;
       case 'p':
          if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
@@ -284,7 +276,7 @@ bool app_get_button (uint16_t id)
  * @param filepath      In: Path to file
  * @return the value
  */
-uint16_t read_digital_inputs_as_uint16_t_from_file (const char * filepath)
+uint16_t read_digital_inputs_from_file (const char * filepath)
 {
    FILE * fp;
    char * line = NULL;
@@ -329,9 +321,81 @@ uint16_t app_get_digital_inputs ()
 {
    if (app_args.path_digital_inputs[0] != '\0')
    {
-      return read_digital_inputs_as_uint16_t_from_file (app_args.path_digital_inputs);
+      return read_digital_inputs_from_file (app_args.path_digital_inputs);
    }
    return 0;
+}
+
+bool is_string_a_number (char * string_to_test)
+{
+   char *next;
+   long val = strtoul (string_to_test, &next, 10);
+
+   // Check for empty string and characters left after conversion.
+   if (next == string_to_test) {
+      APP_LOG_ERROR ("! Unexpected string in the analog input file 0: %s", string_to_test);
+      return false;
+   } else if (strlen(next) > 1) {
+      APP_LOG_ERROR ("! Unexpected string in the analog input file 1: %s", next);
+      return false;
+   }
+
+   return true;
+}
+
+/**
+ * Read 16 integer values from a file
+ *
+ * @param filepath      In: Path to file
+ * @return the values
+ */
+void read_analog_inputs_from_file (const char * filepath, uint16_t * return_values)
+{
+   FILE * fp;
+   char * line = NULL;
+   size_t len = 0;
+   ssize_t read;
+
+   int expected_number_of_lines = (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2);
+   int line_read = 0;
+
+   fp = fopen(filepath, "r");
+   if (fp == NULL)
+   {
+      return;
+   }
+
+   while ((read = getline(&line, &len, fp)) != -1) {
+      if (line_read > expected_number_of_lines - 1) {
+         APP_LOG_ERROR ("! Analog inputs file contains more values than expected");
+         return;
+      }
+
+      if (is_string_a_number(line)) {
+         uint16_t current_value = atoi(line);
+         return_values[line_read] = current_value;
+         // APP_LOG_DEBUG ("Analog input read: %d\n", current_value);
+      }
+
+      line_read++;
+   }
+
+   if (line_read < 16) {
+      APP_LOG_ERROR ("! Analog inputs file contains less values than expected: %d", line_read);
+      return;
+   }
+   
+   fclose (fp);
+   if (line)
+      free(line);
+}
+
+void app_get_analog_inputs (uint16_t * return_values)
+{
+   if (app_args.path_analog_inputs[0] != '\0')
+   {
+      read_analog_inputs_from_file (app_args.path_analog_inputs, return_values);
+   }
 }
 
 void app_set_led (uint16_t id, bool led_state)

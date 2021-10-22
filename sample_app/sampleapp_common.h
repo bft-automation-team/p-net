@@ -53,6 +53,7 @@ typedef struct app_args
    bool factory_reset;
    bool remove_files;
    char path_digital_inputs[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
+   char path_analog_inputs[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
 } app_args_t;
 
 typedef enum
@@ -144,6 +145,16 @@ bool app_get_button (uint16_t id);
  * @return  value of 16 bits as an uint16_t
  */
 uint16_t app_get_digital_inputs ();
+
+/**
+ * Read analog inputs state
+ *
+ * Hardware specific. Implemented in sample app main file for
+ * each supported platform.
+ *
+ * @return  values as an array of unsigned int (16 bits each)
+ */
+void app_get_analog_inputs (uint16_t * return_values);
 
 #ifdef __cplusplus
 }
