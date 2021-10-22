@@ -1460,12 +1460,6 @@ void app_pnet_cfg_init_default (pnet_cfg_t * pnet_cfg)
    pnet_cfg->cb_arg = (void *)&app_state;
 }
 
-static void update_button_states (app_data_t * app)
-{
-   app->button1_pressed = app_get_button (0);
-   app->button2_pressed = app_get_button (1);
-}
-
 static void update_digital_input_states (app_data_t * app)
 {
    app->digital_inputs = app_get_digital_inputs ();
@@ -1515,7 +1509,6 @@ void app_loop_forever (void * arg)
          app->read_inputs_tick_counter++;
          if (app->read_inputs_tick_counter > APP_TICKS_READ_BUTTONS)
          {
-            update_button_states (app);
             update_digital_input_states (app);
             update_analog_input_states (app);
             app->read_inputs_tick_counter = 0;

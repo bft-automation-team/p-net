@@ -134,8 +134,8 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
    }
 
    /* Default values */
-   strcpy (output_arguments.path_button1, "");
-   strcpy (output_arguments.path_button2, "");
+   strcpy (output_arguments.path_inputs_from_plexus, "");
+   strcpy (output_arguments.path_heartbeat, "");
    strcpy (output_arguments.path_storage_directory, "");
    strcpy (output_arguments.station_name, APP_GSDML_DEFAULT_STATION_NAME);
    strcpy (output_arguments.eth_interfaces, APP_DEFAULT_ETHERNET_INTERFACE);
@@ -154,7 +154,7 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
             printf ("Error: The argument to -a is too long.\n");
             exit (EXIT_FAILURE);
          }
-         strcpy (output_arguments.path_digital_inputs, optarg);
+         strcpy (output_arguments.path_inputs_from_plexus, optarg);
          break;
       case 'b':
          if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
@@ -162,7 +162,7 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
             printf ("Error: The argument to -b is too long.\n");
             exit (EXIT_FAILURE);
          }
-         strcpy (output_arguments.path_button1, optarg);
+         strcpy (output_arguments.path_heartbeat, optarg);
          break;
       case 'v':
          output_arguments.verbosity++;
@@ -228,61 +228,41 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
  * @param filepath      In: Path to file
  * @return true if file exists and the first character is '1'
  */
-bool read_bool_from_file (const char * filepath)
-{
-   FILE * fp;
-   char ch;
-   int eof_indicator;
+// bool read_bool_from_file (const char * filepath)
+// {
+//    FILE * fp;
+//    char ch;
+//    int eof_indicator;
 
-   fp = fopen (filepath, "r");
-   if (fp == NULL)
-   {
-      return false;
-   }
+//    fp = fopen (filepath, "r");
+//    if (fp == NULL)
+//    {
+//       return false;
+//    }
 
-   ch = fgetc (fp);
-   eof_indicator = feof (fp);
-   fclose (fp);
+//    ch = fgetc (fp);
+//    eof_indicator = feof (fp);
+//    fclose (fp);
 
-   if (eof_indicator)
-   {
-      return false;
-   }
-   return ch == '1';
-}
-
-bool app_get_button (uint16_t id)
-{
-   if (id == 0)
-   {
-      if (app_args.path_button1[0] != '\0')
-      {
-         return read_bool_from_file (app_args.path_button1);
-      }
-   }
-   else if (id == 1)
-   {
-      if (app_args.path_button2[0] != '\0')
-      {
-         return read_bool_from_file (app_args.path_button2);
-      }
-   }
-   return false;
-}
+//    if (eof_indicator)
+//    {
+//       return false;
+//    }
+//    return ch == '1';
+// }
 
 /**
- * Read a set of boolean values as uint16_t from a file
+ * Checks if Plexus output file contains the expected number of values
  *
  * @param filepath      In: Path to file
- * @return the value
  */
-uint16_t read_digital_inputs_from_file (const char * filepath)
+bool check_plexus_file_structure(const char * filepath)
 {
    FILE * fp;
    char * line = NULL;
    size_t len = 0;
    ssize_t read;
-   uint16_t value = 0;
+   uint8_t comma_counter = 0;
 
    fp = fopen(filepath, "r");
    if (fp == NULL)
@@ -292,20 +272,62 @@ uint16_t read_digital_inputs_from_file (const char * filepath)
 
    read = getline(&line, &len, fp);
    if (read == -1) {
-      APP_LOG_ERROR ("! Error in reading digital inputs file\n");
-      printf("Error in reading digital inputs file");
-      return value;
+      APP_LOG_ERROR ("! Error in reading Plexus outputs file\n");
+      return false;
    }
 
-   read--;
-   if (read != 16) {
-      APP_LOG_ERROR ("! Digital inputs file contains an unexpected number of bits: %lu \n", read);
-      printf("Digital inputs file contains an unexpected number of bits: %lu \n", read);
-      return value;
+   for (int i = 0; i < read - 1; i++) {
+      if (line[i] == ',') {
+         comma_counter++;
+      }
+   }
+   
+   fclose (fp);
+   if (line)
+      free(line);
+   
+   if (comma_counter == (APP_GSDML_INPUT_DATA_SIZE_BIT * 8 + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2 - 1)) {
+      return true;
    }
 
-   for (int i = 0; i < read; i++) {
-      if (line[i] == '1') {
+   APP_LOG_ERROR ("! Plexus outputs file contains a wrong number of values\n");
+   return false;
+}
+
+/**
+ * Read a set of boolean values as uint16_t from a file
+ * File has the following structure:
+ * "0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32"
+ * The first 16 values are the Plexus digital outputs
+ *
+ * @param filepath      In: Path to file
+ * @return the value
+ */
+uint16_t read_digital_inputs_from_file (const char * filepath)
+{
+   if (!check_plexus_file_structure(filepath)) {
+      return 0;
+   }
+
+   FILE * fp;
+   char * line = NULL;
+   size_t len = 0;
+   ssize_t read;
+   uint16_t value = 0;
+   
+   fp = fopen(filepath, "r");
+   if (fp == NULL)
+   {
+      return 0;
+   }
+
+   read = getline(&line, &len, fp);
+   if (read == -1) {
+      return 0;
+   }
+
+   for (int i = 0; i < (APP_GSDML_INPUT_DATA_SIZE_BIT * 8); i++) {
+      if (line[i*2] == '1') {
          value += pow(2, 15-i);
       }
    }
@@ -319,9 +341,9 @@ uint16_t read_digital_inputs_from_file (const char * filepath)
 
 uint16_t app_get_digital_inputs ()
 {
-   if (app_args.path_digital_inputs[0] != '\0')
+   if (app_args.path_inputs_from_plexus[0] != '\0')
    {
-      return read_digital_inputs_from_file (app_args.path_digital_inputs);
+      return read_digital_inputs_from_file (app_args.path_inputs_from_plexus);
    }
    return 0;
 }
@@ -345,19 +367,24 @@ bool is_string_a_number (char * string_to_test)
 
 /**
  * Read 16 integer values from a file
+ * File has the following structure:
+ * "0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32"
+ * The last 16 values are the Plexus analog outputs
  *
  * @param filepath      In: Path to file
  * @return the values
  */
 void read_analog_inputs_from_file (const char * filepath, uint16_t * return_values)
 {
+   if (!check_plexus_file_structure(filepath)) {
+      return;
+   }
+
    FILE * fp;
    char * line = NULL;
    size_t len = 0;
    ssize_t read;
-
-   int expected_number_of_lines = (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2);
-   int line_read = 0;
+   uint8_t read_values_count = 0;
 
    fp = fopen(filepath, "r");
    if (fp == NULL)
@@ -365,23 +392,34 @@ void read_analog_inputs_from_file (const char * filepath, uint16_t * return_valu
       return;
    }
 
-   while ((read = getline(&line, &len, fp)) != -1) {
-      if (line_read > expected_number_of_lines - 1) {
-         APP_LOG_ERROR ("! Analog inputs file contains more values than expected");
-         return;
-      }
-
-      if (is_string_a_number(line)) {
-         uint16_t current_value = atoi(line);
-         return_values[line_read] = current_value;
-         // APP_LOG_DEBUG ("Analog input read: %d\n", current_value);
-      }
-
-      line_read++;
+   read = getline(&line, &len, fp);
+   if (read == -1) {
+      return;
    }
 
-   if (line_read < 16) {
-      APP_LOG_ERROR ("! Analog inputs file contains less values than expected: %d", line_read);
+   char *end = line;
+   uint8_t comma_counter = 0;
+   APP_LOG_ERROR ("! Read line: %s", line);
+
+	while(*end) {
+		int n = strtol(line, &end, 10);
+      comma_counter++;
+      end++;
+
+      if (comma_counter > (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2)) {
+         uint16_t current_value = atoi(line);
+         return_values[read_values_count] = current_value;
+         read_values_count++;
+      }
+      if (comma_counter == APP_GSDML_INPUT_DATA_SIZE_BIT * 8 + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2 - 1) {
+         break;
+      }
+
+		line = end;
+	}
+
+   if (read_values_count != (APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2)) {
+      APP_LOG_ERROR ("! Analog inputs file contains less values than expected: %d", read_values_count);
       return;
    }
    
@@ -392,9 +430,9 @@ void read_analog_inputs_from_file (const char * filepath, uint16_t * return_valu
 
 void app_get_analog_inputs (uint16_t * return_values)
 {
-   if (app_args.path_analog_inputs[0] != '\0')
+   if (app_args.path_inputs_from_plexus[0] != '\0')
    {
-      read_analog_inputs_from_file (app_args.path_analog_inputs, return_values);
+      read_analog_inputs_from_file (app_args.path_inputs_from_plexus, return_values);
    }
 }
 
@@ -448,24 +486,24 @@ int app_pnet_cfg_init_storage (pnet_cfg_t * p_cfg, app_args_t * p_args)
       return -1;
    }
 
-   if (p_args->path_button1[0] != '\0')
+   if (p_args->path_inputs_from_plexus[0] != '\0')
    {
-      if (!pnal_does_file_exist (p_args->path_button1))
+      if (!pnal_does_file_exist (p_args->path_inputs_from_plexus))
       {
          printf (
             "Error: The given input file for Button1 does not exist: %s\n",
-            p_args->path_button1);
+            p_args->path_inputs_from_plexus);
          return -1;
       }
    }
 
-   if (p_args->path_button2[0] != '\0')
+   if (p_args->path_heartbeat[0] != '\0')
    {
-      if (!pnal_does_file_exist (p_args->path_button2))
+      if (!pnal_does_file_exist (p_args->path_heartbeat))
       {
          printf (
-            "Error: The given input file for Button2 does not exist: %s\n",
-            p_args->path_button2);
+            "Error: The given input file for heartbeat does not exist: %s\n",
+            p_args->path_heartbeat);
          return -1;
       }
    }
@@ -503,8 +541,8 @@ int main (int argc, char * argv[])
    APP_LOG_INFO ("App log level:        %u (DEBUG=0, FATAL=4)\n", app_log_level);
    APP_LOG_INFO ("Max number of ports:  %u\n", PNET_MAX_PHYSICAL_PORTS);
    APP_LOG_INFO ("Network interfaces:   %s\n", app_args.eth_interfaces);
-   APP_LOG_INFO ("Button1 file:         %s\n", app_args.path_button1);
-   APP_LOG_INFO ("Button2 file:         %s\n", app_args.path_button2);
+   APP_LOG_INFO ("Plexus outputs file:  %s\n", app_args.path_inputs_from_plexus);
+   APP_LOG_INFO ("Heartbeat file:       %s\n", app_args.path_heartbeat);
    APP_LOG_INFO ("Default station name: %s\n", app_args.station_name);
 
    app_pnet_cfg_init_default (&pnet_cfg);
