@@ -447,7 +447,7 @@ int app_pnet_cfg_init_storage (pnet_cfg_t * p_cfg, app_args_t * p_args)
       if (!pnal_does_file_exist (p_args->path_inputs_from_plexus))
       {
          printf (
-            "Error: The given input file for Button1 does not exist: %s\n",
+            "Error: The given input file for plexus inputs does not exist: %s\n",
             p_args->path_inputs_from_plexus);
          return -1;
       }
