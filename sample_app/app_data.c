@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define APP_DATA_DEFAULT_OUTPUT_DATA 0
 
@@ -84,6 +85,9 @@ uint8_t * app_data_get_input_data (
       *iops = PNET_IOXS_BAD;
       return NULL;
    }
+   
+   struct timespec spec;
+   clock_gettime(CLOCK_REALTIME, &spec);
 
    // APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
    //    BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
@@ -92,12 +96,12 @@ uint8_t * app_data_get_input_data (
     * Most 2 significant bytes: Digital inputs (16 bits)
     * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
-   // conversion from original data type to bytes, for communication 
+   // conversion from original data type to bytes, for communication
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_BIT / 2; i++) {
-      inputdata[(i*2)] = reverse_byte(plexus_inputs[i] & 0xFF);
-      inputdata[(i*2) + 1] = reverse_byte(plexus_inputs[i] >> 8);
-      // APP_LOG_DEBUG ("* app_data_get_input_data => Analog input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", i,
-      //    BYTE_TO_BINARY(analog_inputs[i]>>8), BYTE_TO_BINARY(analog_inputs[i]), analog_inputs[i]);
+      inputdata[(i*2)] = plexus_inputs[i] >> 8;
+      inputdata[(i*2) + 1] = plexus_inputs[i] & 0xFF;
+      APP_LOG_DEBUG ("* %d app_data_get_input_data => Analog input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", spec.tv_sec, i,
+         BYTE_TO_BINARY(plexus_inputs[i]>>8), BYTE_TO_BINARY(plexus_inputs[i]), plexus_inputs[i]);
    }
 
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
