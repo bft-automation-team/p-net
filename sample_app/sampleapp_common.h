@@ -135,24 +135,14 @@ void app_set_led (uint16_t id, bool led_state);
 bool app_get_button (uint16_t id);
 
 /**
- * Read digital inputs state
+ * Read inputs state
  *
  * Hardware specific. Implemented in sample app main file for
  * each supported platform.
  *
- * @return  value of 16 bits as an uint16_t
+ * @param read_values   Memory buffer to store read values
  */
-uint16_t app_get_digital_inputs ();
-
-/**
- * Read analog inputs state
- *
- * Hardware specific. Implemented in sample app main file for
- * each supported platform.
- *
- * @return  values as an array of unsigned int (16 bits each)
- */
-void app_get_analog_inputs (uint16_t * return_values);
+void app_get_inputs (uint16_t * read_values);
 
 /**
  * Writes current timestamp on a file.

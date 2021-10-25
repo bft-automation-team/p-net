@@ -67,8 +67,7 @@ unsigned char reverse_byte(unsigned char b) {
 
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
-   uint16_t digital_inputs,
-   uint16_t * analog_inputs,
+   uint16_t * plexus_inputs,
    uint16_t * size,
    uint8_t * iops)
 {
@@ -93,14 +92,28 @@ uint8_t * app_data_get_input_data (
     * Most 2 significant bytes: Digital inputs (16 bits)
     * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
-   // conversion from original data type to bytes, for communication   
-   inputdata[0] = reverse_byte(digital_inputs & 0xFF);
-   inputdata[1] = reverse_byte(digital_inputs >> 8);
-   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
-      inputdata[2 + (i*2)] = (analog_inputs[i] >> 8);
-      inputdata[2 + (i*2) + 1] = analog_inputs[i] & 0xFF;
+   // conversion from original data type to bytes, for communication 
+   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_BIT / 2; i++) {
+      inputdata[(i*2)] = reverse_byte(plexus_inputs[i] & 0xFF);
+      inputdata[(i*2) + 1] = reverse_byte(plexus_inputs[i] >> 8);
       // APP_LOG_DEBUG ("* app_data_get_input_data => Analog input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", i,
       //    BYTE_TO_BINARY(analog_inputs[i]>>8), BYTE_TO_BINARY(analog_inputs[i]), analog_inputs[i]);
+   }
+
+   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
+      inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)] = (plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i] >> 8);
+      inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1] = plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i] & 0xFF;
+      // if (i == 0) {
+      //    APP_LOG_DEBUG ("* app_data_get_input_data => Analog input "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
+      //       BYTE_TO_BINARY(plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]>>8),
+      //       BYTE_TO_BINARY(plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]),
+      //       plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]);
+      //    APP_LOG_DEBUG ("* app_data_get_input_data => Analog input "BYTE_TO_BINARY_PATTERN" (%d) "BYTE_TO_BINARY_PATTERN" (%d)\n",
+      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)]),
+      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)],
+      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1]),
+      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1]);
+      // }
    }
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
    // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);

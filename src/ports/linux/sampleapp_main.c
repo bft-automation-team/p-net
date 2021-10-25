@@ -254,23 +254,17 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
 /**
  * Checks if Plexus output file contains the expected number of values
  *
- * @param filepath      In: Path to file
+ * @param fp      In: File pointer
  */
-bool check_plexus_file_structure(const char * filepath)
+bool check_plexus_file_structure(FILE * fp)
 {
-   FILE * fp;
    char * line = NULL;
    size_t len = 0;
    ssize_t read;
    uint8_t comma_counter = 0;
 
-   fp = fopen(filepath, "r");
-   if (fp == NULL)
-   {
-      return false;
-   }
-
    read = getline(&line, &len, fp);
+   rewind(fp);
    if (read == -1) {
       APP_LOG_ERROR ("! Error in reading Plexus outputs file\n");
       return false;
@@ -282,7 +276,6 @@ bool check_plexus_file_structure(const char * filepath)
       }
    }
    
-   fclose (fp);
    if (line)
       free(line);
    
@@ -290,105 +283,37 @@ bool check_plexus_file_structure(const char * filepath)
       return true;
    }
 
-   APP_LOG_ERROR ("! Plexus outputs file contains a wrong number of values\n");
+   APP_LOG_ERROR ("! Plexus outputs file contains a wrong number of values: %d\n", comma_counter + 1);
    return false;
 }
 
 /**
- * Read a set of boolean values as uint16_t from a file
+ * Read values from a file
  * File has the following structure:
  * "0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32"
- * The first 16 values are the Plexus digital outputs
- *
- * @param filepath      In: Path to file
- * @return the value
- */
-uint16_t read_digital_inputs_from_file (const char * filepath)
-{
-   if (!check_plexus_file_structure(filepath)) {
-      return 0;
-   }
-
-   FILE * fp;
-   char * line = NULL;
-   size_t len = 0;
-   ssize_t read;
-   uint16_t value = 0;
-   
-   fp = fopen(filepath, "r");
-   if (fp == NULL)
-   {
-      return 0;
-   }
-
-   read = getline(&line, &len, fp);
-   if (read == -1) {
-      return 0;
-   }
-
-   for (int i = 0; i < (APP_GSDML_INPUT_DATA_SIZE_BIT * 8); i++) {
-      if (line[i*2] == '1') {
-         value += pow(2, 15-i);
-      }
-   }
-   
-   fclose (fp);
-   if (line)
-      free(line);
-   
-   return value;
-}
-
-uint16_t app_get_digital_inputs ()
-{
-   if (app_args.path_inputs_from_plexus[0] != '\0')
-   {
-      return read_digital_inputs_from_file (app_args.path_inputs_from_plexus);
-   }
-   return 0;
-}
-
-bool is_string_a_number (char * string_to_test)
-{
-   char *next;
-   long val = strtoul (string_to_test, &next, 10);
-
-   // Check for empty string and characters left after conversion.
-   if (next == string_to_test) {
-      APP_LOG_ERROR ("! Unexpected string in the analog input file 0: %s", string_to_test);
-      return false;
-   } else if (strlen(next) > 1) {
-      APP_LOG_ERROR ("! Unexpected string in the analog input file 1: %s", next);
-      return false;
-   }
-
-   return true;
-}
-
-/**
- * Read 16 integer values from a file
- * File has the following structure:
- * "0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32"
- * The last 16 values are the Plexus analog outputs
+ * The first (APP_GSDML_INPUT_DATA_SIZE_BIT * 8) values are the Plexus digital outputs
+ * The last M values are the Plexus analog outputs
  *
  * @param filepath      In: Path to file
  * @return the values
  */
-void read_analog_inputs_from_file (const char * filepath, uint16_t * return_values)
+void read_inputs_from_file (const char * filepath, uint16_t * return_values)
 {
-   if (!check_plexus_file_structure(filepath)) {
-      return;
-   }
-
    FILE * fp;
    char * line = NULL;
    size_t len = 0;
    ssize_t read;
    uint8_t read_values_count = 0;
+   uint16_t digital_values = 0;
 
    fp = fopen(filepath, "r");
    if (fp == NULL)
    {
+      return;
+   }
+
+   if (!check_plexus_file_structure(fp)) {
+      fclose (fp);
       return;
    }
 
@@ -397,18 +322,29 @@ void read_analog_inputs_from_file (const char * filepath, uint16_t * return_valu
       return;
    }
 
+   // digital inputs
+   for (int i = 0; i < (APP_GSDML_INPUT_DATA_SIZE_BIT * 8); i++) {
+      if (line[i*2] == '1') {
+         digital_values += pow(2, 15-i);
+      }
+   }
+   return_values[0] = digital_values;
+
+   // analog inputs
+   rewind(fp);
+   read = getline(&line, &len, fp);
    line += (APP_GSDML_INPUT_DATA_SIZE_BIT * 8 * 2);  // substring of digital portion
    char *end = line;
    uint8_t comma_counter = 0;
    // APP_LOG_ERROR ("! Read line, analog values: %s", line);
 
 	while(*end) {
-		uint8_t n = strtoul(line, &end, 10);
+		uint16_t n = strtoul(line, &end, 10);
 		while (*end == ',') {
 			end++;
 		}
 
-      return_values[read_values_count] = n;
+      return_values[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + read_values_count] = n;
       read_values_count++;
       line = end;
 
@@ -425,12 +361,13 @@ void read_analog_inputs_from_file (const char * filepath, uint16_t * return_valu
    fclose (fp);
 }
 
-void app_get_analog_inputs (uint16_t * return_values)
+void app_get_inputs (uint16_t * return_values)
 {
    if (app_args.path_inputs_from_plexus[0] != '\0')
    {
-      read_analog_inputs_from_file (app_args.path_inputs_from_plexus, return_values);
+      return read_inputs_from_file (app_args.path_inputs_from_plexus, return_values);
    }
+   return;
 }
 
 void write_heartbeat_to_file (const char * filepath)

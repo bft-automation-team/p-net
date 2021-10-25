@@ -92,8 +92,7 @@ typedef struct app_data_t
    bool button1_pressed;
    bool button2_pressed;
    bool button2_pressed_previous;
-   uint16_t digital_inputs;
-   uint16_t analog_inputs[APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
+   uint16_t plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT * 8 / 16) + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
 
    /* Counters used to control when buttons are checked
     * and process data is updated
@@ -938,8 +937,7 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
        */
       indata = app_data_get_input_data (
          subslot->submodule_id,
-         app->digital_inputs,
-         app->analog_inputs,
+         app->plexus_inputs,
          &indata_size,
          &iops);
 
@@ -1052,8 +1050,7 @@ static int app_set_initial_data_and_ioxs (app_data_t * app)
                {
                   indata = app_data_get_input_data (
                      p_subslot->submodule_id,
-                     app->digital_inputs,
-                     app->analog_inputs,
+                     app->plexus_inputs,
                      &indata_size,
                      &iops);
                }
@@ -1460,14 +1457,9 @@ void app_pnet_cfg_init_default (pnet_cfg_t * pnet_cfg)
    pnet_cfg->cb_arg = (void *)&app_state;
 }
 
-static void update_digital_input_states (app_data_t * app)
+static void update_input_states (app_data_t * app)
 {
-   app->digital_inputs = app_get_digital_inputs ();
-}
-
-static void update_analog_input_states (app_data_t * app)
-{
-   app_get_analog_inputs (app->analog_inputs);
+   app_get_inputs (app->plexus_inputs);
 }
 
 void app_loop_forever (void * arg)
@@ -1509,8 +1501,7 @@ void app_loop_forever (void * arg)
          app->read_inputs_tick_counter++;
          if (app->read_inputs_tick_counter > APP_TICKS_READ_BUTTONS)
          {
-            update_digital_input_states (app);
-            update_analog_input_states (app);
+            update_input_states (app);
             update_heartbeat ();
             app->read_inputs_tick_counter = 0;
          }
