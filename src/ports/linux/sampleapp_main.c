@@ -61,27 +61,27 @@ app_args_t app_args = {0};
 
 void show_usage()
 {
-   printf ("\nSample application for p-net Profinet device stack.\n");
+   printf ("\nPlexus adaptation of the sample application for p-net Profinet device stack.\n");
    printf ("\n");
    printf ("Wait for connection from IO-controller.\n");
-   printf ("Then read buttons (input) and send to controller.\n");
-   printf ("Listen for application LED output (from controller) and set "
-           "application LED state.\n");
-   printf ("It will also send a counter value (useful also without buttons and "
-           "LED).\n");
-   printf ("Button1 value is sent in the periodic data.\n");
-   printf ("Button2 cycles through triggering an alarm, setting diagnosis and "
-           "creating logbook entries.\n");
+   // printf ("Then read buttons (input) and send to controller.\n");
+   // printf ("Listen for application LED output (from controller) and set "
+   //         "application LED state.\n");
+   // printf ("It will also send a counter value (useful also without buttons and "
+   //         "LED).\n");
+   // printf ("Button1 value is sent in the periodic data.\n");
+   // printf ("Button2 cycles through triggering an alarm, setting diagnosis and "
+   //         "creating logbook entries.\n");
    printf ("\n");
-   printf ("Also the mandatory Profinet signal LED is controlled by this "
+   printf ("The mandatory Profinet signal LED is controlled by this "
            "application.\n");
    printf ("\n");
    printf ("The LEDs are controlled by the script set_profinet_leds\n");
    printf ("located in the same directory as the application binary.\n");
-   printf ("A version for Raspberry Pi is available, and also a version "
-           "writing\n");
-   printf ("to plain text files (useful for demo if no LEDs are available).\n");
-   printf ("\n");
+   // printf ("A version for Raspberry Pi is available, and also a version "
+   //         "writing\n");
+   // printf ("to plain text files (useful for demo if no LEDs are available).\n");
+   // printf ("\n");
    printf ("Assumes the default gateway is found on .1 on same subnet as the "
            "IP address.\n");
    printf ("\n");
