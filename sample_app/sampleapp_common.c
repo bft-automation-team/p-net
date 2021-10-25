@@ -89,9 +89,8 @@ typedef struct app_data_t
 
    uint32_t arep_for_appl_ready;
 
-   bool button1_pressed;
-   bool button2_pressed;
-   bool button2_pressed_previous;
+   bool alarm_button_demo_pressed;
+   bool alarm_button_demo_pressed_previous;
    uint16_t plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT * 8 / 16) + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
 
    /* Counters used to control when buttons are checked
@@ -1513,12 +1512,12 @@ void app_loop_forever (void * arg)
 
          /* Run alarm demo function if button2 is pressed */
          if (
-            (app->button2_pressed == true) &&
-            (app->button2_pressed_previous == false))
+            (app->alarm_button_demo_pressed == true) &&
+            (app->alarm_button_demo_pressed_previous == false))
          {
             app_handle_demo_pnet_api (app);
          }
-         app->button2_pressed_previous = app->button2_pressed;
+         app->alarm_button_demo_pressed_previous = app->alarm_button_demo_pressed;
 
          /* Run p-net stack */
          pnet_handle_periodic (app->net);
