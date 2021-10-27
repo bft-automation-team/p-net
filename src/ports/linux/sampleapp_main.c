@@ -46,9 +46,9 @@
 #define APP_SNMP_THREAD_PRIORITY       1
 #define APP_SNMP_THREAD_STACKSIZE      256 * 1024 /* bytes */
 #define APP_ETH_THREAD_PRIORITY        10
-#define APP_ETH_THREAD_STACKSIZE       4096 /* bytes */
+#define APP_ETH_THREAD_STACKSIZE       8192 /* bytes */
 #define APP_BG_WORKER_THREAD_PRIORITY  5
-#define APP_BG_WORKER_THREAD_STACKSIZE 4096 /* bytes */
+#define APP_BG_WORKER_THREAD_STACKSIZE 8192 /* bytes */
 
 /* Note that this sample application uses os_timer_create() for the timer
    that controls the ticks. It is implemented in OSAL, and the Linux

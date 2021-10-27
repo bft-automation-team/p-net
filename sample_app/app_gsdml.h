@@ -102,21 +102,9 @@ typedef struct
    uint16_t length;
 } app_gsdml_param_t;
 
-#define APP_GSDML_MOD_ID_8_0_DIGITAL_IN     0x00000030
-#define APP_GSDML_MOD_ID_0_8_DIGITAL_OUT    0x00000031
-#define APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT 0x00000033
-// #define APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT 0x00000033
-#define APP_GSDML_SUBMOD_ID_DIGITAL_IN      0x00000130
-#define APP_GSDML_SUBMOD_ID_DIGITAL_OUT     0x00000131
-#define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000133
-// #define APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT  0x00000133
+#define APP_GSDML_MOD_ID_32_32_ANALOG_DIGITAL_IN_OUT 0x00000033
+#define APP_GSDML_SUBMOD_ID_ANALOG_DIGITAL_IN_OUT  0x00000133
 
-// #define APP_GSDML_INPUT_DATA_SIZE_DIGITAL       2 /* bytes, for digital inputs data */
-// #define APP_GSDML_INPUT_DATA_SIZE_ANALOG    (16 * 2) /* bytes, for analog inputs data */
-// #define APP_GSDML_INPUT_DATA_SIZE           (APP_GSDML_INPUT_DATA_SIZE_DIGITAL + APP_GSDML_INPUT_DATA_SIZE_ANALOG) /* total bytes, for inputs data */
-// #define APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL      2 /* bytes, for digital outputs data */
-// #define APP_GSDML_OUTPUT_DATA_SIZE_ANALOG   (16 * 2) /* bytes, for analog outputs data */
-// #define APP_GSDML_OUTPUT_DATA_SIZE          (APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL + APP_GSDML_OUTPUT_DATA_SIZE_ANALOG) /* total bytes, for outputs data */
 #define APP_GSDML_INPUT_DATA_SIZE_DIGITAL   2 /* bytes, for digital inputs data */
 #define APP_GSDML_INPUT_DATA_SIZE_ANALOG    (16 * 2) /* bytes, for analog inputs data */
 #define APP_GSDML_INPUT_DATA_SIZE           (APP_GSDML_INPUT_DATA_SIZE_DIGITAL + APP_GSDML_INPUT_DATA_SIZE_ANALOG) /* total bytes, for inputs data */

@@ -921,7 +921,7 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
    uint16_t outdata_length;
    uint8_t outdata_iops;
 
-   uint8_t outdata_buf[10]; /* Todo: Remove temporary buffer */
+   uint8_t outdata_buf[APP_GSDML_OUTPUT_DATA_SIZE + 1];
 
    if (app == NULL)
    {
@@ -994,7 +994,7 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
 
       if (outdata_length != subslot->data_cfg.outsize)
       {
-         APP_LOG_ERROR ("Wrong outputdata length: %u\n", outdata_length);
+         APP_LOG_ERROR ("Wrong outputdata length (in bytes): %u\n", outdata_length);
          app_set_outputs_default_value();
       }
       else if (outdata_iops == PNET_IOXS_GOOD)

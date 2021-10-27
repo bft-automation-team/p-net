@@ -38,7 +38,7 @@
 #define APP_LOG_LEVEL                  APP_LOG_LEVEL_INFO
 
 #define APP_BG_WORKER_THREAD_PRIORITY  2
-#define APP_BG_WORKER_THREAD_STACKSIZE 4096 /* bytes */
+#define APP_BG_WORKER_THREAD_STACKSIZE 8192 /* bytes */
 
 /********************************** Globals ***********************************/
 

@@ -83,9 +83,7 @@ uint8_t * app_data_get_input_data (
       return NULL;
    }
 
-   if (
-      submodule_id != APP_GSDML_SUBMOD_ID_DIGITAL_IN &&
-      submodule_id != APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT)
+   if (submodule_id != APP_GSDML_SUBMOD_ID_ANALOG_DIGITAL_IN_OUT)
    {
       /* Automated RT Tester scenario 2 - unsupported (sub)module */
       *iops = PNET_IOXS_BAD;
@@ -139,9 +137,7 @@ int app_data_set_output_data (
       struct timespec spec;
       clock_gettime(CLOCK_REALTIME, &spec);
       
-      if (
-         submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_OUT ||
-         submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT)
+      if (submodule_id == APP_GSDML_SUBMOD_ID_ANALOG_DIGITAL_IN_OUT)
       {
          uint16_t data_for_plexus_input[APP_GSDML_OUTPUT_DATA_SIZE / 2] = {0};
          memcpy (outputdata, data, size);    // outputdata comes from Codesys PNIO mapped OUTPUTS!
