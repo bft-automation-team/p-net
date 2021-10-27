@@ -48,6 +48,11 @@ app_args_t app_args = {0};
 
 /************************* Utilities ******************************************/
 
+void app_set_output_state (uint16_t * output_state)
+{
+   printf ("! NOT IMPLEMENTED: \n");
+}
+
 void app_set_led (uint16_t id, bool led_state)
 {
    if (id == APP_DATA_LED_ID)

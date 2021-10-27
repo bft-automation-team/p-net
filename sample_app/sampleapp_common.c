@@ -91,7 +91,8 @@ typedef struct app_data_t
 
    bool alarm_button_demo_pressed;
    bool alarm_button_demo_pressed_previous;
-   uint16_t plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT * 8 / 16) + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
+   uint16_t plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8 / 16) + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2];
+   uint16_t plexus_inputs[(APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL * 8 / 16) + APP_GSDML_OUTPUT_DATA_SIZE_ANALOG / 2];
 
    /* Counters used to control when buttons are checked
     * and process data is updated
@@ -936,7 +937,7 @@ static void app_cyclic_data_callback (app_subslot_t * subslot, void * tag)
        */
       indata = app_data_get_input_data (
          subslot->submodule_id,
-         app->plexus_inputs,
+         app->plexus_outputs,
          &indata_size,
          &iops);
 
@@ -1049,7 +1050,7 @@ static int app_set_initial_data_and_ioxs (app_data_t * app)
                {
                   indata = app_data_get_input_data (
                      p_subslot->submodule_id,
-                     app->plexus_inputs,
+                     app->plexus_outputs,
                      &indata_size,
                      &iops);
                }
@@ -1458,7 +1459,7 @@ void app_pnet_cfg_init_default (pnet_cfg_t * pnet_cfg)
 
 static void update_input_states (app_data_t * app)
 {
-   app_get_inputs (app->plexus_inputs);
+   app_get_inputs (app->plexus_outputs);
 }
 
 void app_loop_forever (void * arg)
@@ -1470,7 +1471,7 @@ void app_loop_forever (void * arg)
 
    app->main_api.arep = UINT32_MAX;
 
-   app_set_led (APP_DATA_LED_ID, false);
+   app_set_outputs_default_value ();
    app_plug_dap (app, app->pnet_cfg->num_physical_ports);
    APP_LOG_INFO ("Waiting for PLC connect request\n\n");
 

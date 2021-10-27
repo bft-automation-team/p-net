@@ -45,12 +45,8 @@ extern "C" {
 
 /**
  * Get PNIO input data using module id.
- * The main sample application keep track
- * of button and counter state so these are
- * parameters to this function.
  * @param submodule_id  In:  Submodule id
- * @param button_state  In:  State of button 1
- * @param counter       In:  Sample app counter value
+ * @param plexus_outputs  In:  Read input from input data file
  * @param size          Out: Size of pnio data
  * @param iops          Out: Provider status. If for example
  *                           a sensor is failing or a short
@@ -60,7 +56,7 @@ extern "C" {
  */
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
-   uint16_t * plexus_inputs,
+   uint16_t * plexus_outputs,
    uint16_t * size,
    uint8_t * iops);
 

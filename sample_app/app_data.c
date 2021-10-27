@@ -38,27 +38,15 @@ uint32_t app_param_2 = 0;
 /* Process data */
 uint8_t inputdata[APP_GSDML_INPUT_DATA_SIZE] = {0};
 uint8_t outputdata[APP_GSDML_OUTPUT_DATA_SIZE] = {0};
+uint16_t previous_output_state[APP_GSDML_OUTPUT_DATA_SIZE / 2] = {0};
+
 
 /**
- * Set LED state.
+ * Reverts values of a byte.
  *
- * Compares new state with previous state, to minimize system calls.
- *
- * Uses the hardware specific app_set_led() function.
- *
- * @param led_state        In:    New LED state
+ * @param b        In:    Input byte
+ * @return         Reversed byte
  */
-static void app_handle_data_led_state (bool led_state)
-{
-   static bool previous_led_state = false;
-
-   if (led_state != previous_led_state)
-   {
-      app_set_led (APP_DATA_LED_ID, led_state);
-   }
-   previous_led_state = led_state;
-}
-
 unsigned char reverse_byte(unsigned char b) {
    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
@@ -66,9 +54,27 @@ unsigned char reverse_byte(unsigned char b) {
    return b;
 }
 
+/**
+ * Set output state.
+ *
+ * Compares new state with previous state, to minimize system calls.
+ *
+ * @param led_state        In:    New LED state
+ */
+static void app_handle_output (uint16_t * output_data)
+{
+   for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE / 2; i++) {
+      if (output_data[i] != previous_output_state[i]) {
+         app_set_output_state(output_data);
+         memcpy(previous_output_state, output_data, APP_GSDML_OUTPUT_DATA_SIZE / 2);
+         return;
+      }
+   }
+}
+
 uint8_t * app_data_get_input_data (
    uint32_t submodule_id,
-   uint16_t * plexus_inputs,
+   uint16_t * plexus_outputs,
    uint16_t * size,
    uint8_t * iops)
 {
@@ -89,38 +95,33 @@ uint8_t * app_data_get_input_data (
    struct timespec spec;
    clock_gettime(CLOCK_REALTIME, &spec);
 
-   // APP_LOG_DEBUG ("* app_data_get_input_data => Digital inputs "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
-   //    BYTE_TO_BINARY(digital_inputs>>8), BYTE_TO_BINARY(digital_inputs), digital_inputs);
-
    /* Prepare input data.
     * Most 2 significant bytes: Digital inputs (16 bits)
     * Lowest 32 bits: Analog inputs (16 uint16_t)    
     */
    // conversion from original data type to bytes, for communication
-   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_BIT / 2; i++) {
-      inputdata[(i*2)] = plexus_inputs[i] >> 8;
-      inputdata[(i*2) + 1] = plexus_inputs[i] & 0xFF;
-      APP_LOG_DEBUG ("* %d app_data_get_input_data => Analog input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", spec.tv_sec, i,
-         BYTE_TO_BINARY(plexus_inputs[i]>>8), BYTE_TO_BINARY(plexus_inputs[i]), plexus_inputs[i]);
+   for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2; i++) {
+      inputdata[(i*2)] = plexus_outputs[i] >> 8;
+      inputdata[(i*2) + 1] = plexus_outputs[i] & 0xFF;
+      APP_LOG_DEBUG ("* %d app_data_get_input_data => Digital input %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", spec.tv_sec, i,
+         BYTE_TO_BINARY(plexus_outputs[i]>>8), BYTE_TO_BINARY(plexus_outputs[i]), plexus_outputs[i]);
    }
 
    for (int i = 0; i < APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2; i++) {
-      inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)] = (plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i] >> 8);
-      inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1] = plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i] & 0xFF;
+      inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2)] = (plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + i] >> 8);
+      inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2) + 1] = plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + i] & 0xFF;
       // if (i == 0) {
       //    APP_LOG_DEBUG ("* app_data_get_input_data => Analog input "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
-      //       BYTE_TO_BINARY(plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]>>8),
-      //       BYTE_TO_BINARY(plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]),
-      //       plexus_inputs[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + i]);
+      //       BYTE_TO_BINARY(plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + i]>>8),
+      //       BYTE_TO_BINARY(plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + i]),
+      //       plexus_outputs[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + i]);
       //    APP_LOG_DEBUG ("* app_data_get_input_data => Analog input "BYTE_TO_BINARY_PATTERN" (%d) "BYTE_TO_BINARY_PATTERN" (%d)\n",
-      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)]),
-      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2)],
-      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1]),
-      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_BIT + (i*2) + 1]);
+      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2)]),
+      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2)],
+      //       BYTE_TO_BINARY(inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2) + 1]),
+      //       inputdata[APP_GSDML_INPUT_DATA_SIZE_DIGITAL + (i*2) + 1]);
       // }
    }
-   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[0] %d\n", inputdata[0]);
-   // APP_LOG_DEBUG ("* app_data_get_input_data => inputdata[1] %d\n", inputdata[1]);
 
    *size = APP_GSDML_INPUT_DATA_SIZE;
    *iops = PNET_IOXS_GOOD;
@@ -133,22 +134,28 @@ int app_data_set_output_data (
    uint8_t * data,
    uint16_t size)
 {
-   bool led_state;
-
    if (data != NULL && size == APP_GSDML_OUTPUT_DATA_SIZE)
    {
+      struct timespec spec;
+      clock_gettime(CLOCK_REALTIME, &spec);
+      
       if (
          submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_OUT ||
          submodule_id == APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT)
       {
-         // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
-         memcpy (outputdata, data, size);
-         led_state = (outputdata[0] & 0x80) > 0;
-         /*
-            outputdata comes from Codesys PNIO mapped OUTPUTS!
-         */
-         // app_log_print_bytes (APP_LOG_LEVEL_DEBUG, outputdata, size);
-         app_handle_data_led_state (led_state);
+         uint16_t data_for_plexus_input[APP_GSDML_OUTPUT_DATA_SIZE / 2] = {0};
+         memcpy (outputdata, data, size);    // outputdata comes from Codesys PNIO mapped OUTPUTS!
+
+         for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE / 2; i++) {
+            data_for_plexus_input[i] = ((uint16_t)outputdata[i] << 8) | outputdata[i+1];
+            APP_LOG_DEBUG ("* value %d = %d \n", i, data_for_plexus_input[i]);
+            // if (i == 2) {
+            //    uint16_t analog_output = data_for_plexus_input[i];
+            //    APP_LOG_DEBUG ("* %d app_data_set_output_data => Output %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", spec.tv_sec, i,
+            //       BYTE_TO_BINARY(outputdata[i]), BYTE_TO_BINARY(outputdata[i+1]), analog_output);
+            // }
+         }
+         app_handle_output (data_for_plexus_input);
          return 0;
       }
    }
@@ -157,8 +164,13 @@ int app_data_set_output_data (
 
 int app_data_set_default_outputs (void)
 {
-   outputdata[0] = APP_DATA_DEFAULT_OUTPUT_DATA;
-   app_handle_data_led_state (false);
+   for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE; i++) {
+      outputdata[i] = APP_DATA_DEFAULT_OUTPUT_DATA;
+   }
+
+   uint16_t data_for_plexus_input[APP_GSDML_OUTPUT_DATA_SIZE / 2] = {0};
+   app_handle_output (data_for_plexus_input);
+   
    return 0;
 }
 

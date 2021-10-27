@@ -64,24 +64,12 @@ void show_usage()
    printf ("\nPlexus adaptation of the sample application for p-net Profinet device stack.\n");
    printf ("\n");
    printf ("Wait for connection from IO-controller.\n");
-   // printf ("Then read buttons (input) and send to controller.\n");
-   // printf ("Listen for application LED output (from controller) and set "
-   //         "application LED state.\n");
-   // printf ("It will also send a counter value (useful also without buttons and "
-   //         "LED).\n");
-   // printf ("Button1 value is sent in the periodic data.\n");
-   // printf ("Button2 cycles through triggering an alarm, setting diagnosis and "
-   //         "creating logbook entries.\n");
    printf ("\n");
    printf ("The mandatory Profinet signal LED is controlled by this "
            "application.\n");
    printf ("\n");
    printf ("The LEDs are controlled by the script set_profinet_leds\n");
    printf ("located in the same directory as the application binary.\n");
-   // printf ("A version for Raspberry Pi is available, and also a version "
-   //         "writing\n");
-   // printf ("to plain text files (useful for demo if no LEDs are available).\n");
-   // printf ("\n");
    printf ("Assumes the default gateway is found on .1 on same subnet as the "
            "IP address.\n");
    printf ("\n");
@@ -102,9 +90,11 @@ void show_usage()
       APP_GSDML_DEFAULT_STATION_NAME);
    printf ("                if not already available in storage file.\n");
    printf ("   -a FILE      Path (absolute or relative) to read Plexus outputs. "
-           "Defaults to not read Plexus outputs.\n");
+           "Defaults to not read a file describing Plexus outputs.\n");
    printf ("   -b FILE      Path (absolute or relative) to write the Plexus heartbeat file. "
            "Defaults to not write Plexus heartbeat file.\n");
+   printf ("   -c FILE      Path (absolute or relative) to write Plexus inputs. "
+           "Defaults to not write a file to be read from Plexus.\n");
    printf ("   -p PATH      Absolute path to storage directory. Defaults to "
            "use current directory.\n");
    printf ("\n");
@@ -135,6 +125,7 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
 
    /* Default values */
    strcpy (output_arguments.path_inputs_from_plexus, "");
+   strcpy (output_arguments.path_outputs_for_plexus, "");
    strcpy (output_arguments.path_heartbeat, "");
    strcpy (output_arguments.path_storage_directory, "");
    strcpy (output_arguments.station_name, APP_GSDML_DEFAULT_STATION_NAME);
@@ -144,7 +135,7 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
    output_arguments.factory_reset = false;
    output_arguments.remove_files = false;
 
-   while ((option = getopt (argc, argv, "hvgfra:b:i:s:p:")) != -1)
+   while ((option = getopt (argc, argv, "hvgfra:b:c:i:s:p:")) != -1)
    {
       switch (option)
       {
@@ -163,6 +154,14 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
             exit (EXIT_FAILURE);
          }
          strcpy (output_arguments.path_heartbeat, optarg);
+         break;
+      case 'c':
+         if (strlen (optarg) + 1 > PNET_MAX_FILE_FULLPATH_SIZE)
+         {
+            printf ("Error: The argument to -c is too long.\n");
+            exit (EXIT_FAILURE);
+         }
+         strcpy (output_arguments.path_outputs_for_plexus, optarg);
          break;
       case 'v':
          output_arguments.verbosity++;
@@ -223,35 +222,6 @@ app_args_t parse_commandline_arguments (int argc, char * argv[])
 }
 
 /**
- * Read a bool from a file
- *
- * @param filepath      In: Path to file
- * @return true if file exists and the first character is '1'
- */
-// bool read_bool_from_file (const char * filepath)
-// {
-//    FILE * fp;
-//    char ch;
-//    int eof_indicator;
-
-//    fp = fopen (filepath, "r");
-//    if (fp == NULL)
-//    {
-//       return false;
-//    }
-
-//    ch = fgetc (fp);
-//    eof_indicator = feof (fp);
-//    fclose (fp);
-
-//    if (eof_indicator)
-//    {
-//       return false;
-//    }
-//    return ch == '1';
-// }
-
-/**
  * Checks if Plexus output file contains the expected number of values
  *
  * @param fp      In: File pointer
@@ -279,7 +249,7 @@ bool check_plexus_file_structure(FILE * fp)
    if (line)
       free(line);
    
-   if (comma_counter == (APP_GSDML_INPUT_DATA_SIZE_BIT * 8 + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2 - 1)) {
+   if (comma_counter == (APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8 + APP_GSDML_INPUT_DATA_SIZE_ANALOG / 2 - 1)) {
       return true;
    }
 
@@ -291,7 +261,7 @@ bool check_plexus_file_structure(FILE * fp)
  * Read values from a file
  * File has the following structure:
  * "0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32"
- * The first (APP_GSDML_INPUT_DATA_SIZE_BIT * 8) values are the Plexus digital outputs
+ * The first (APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8) values are the Plexus digital outputs
  * The last M values are the Plexus analog outputs
  *
  * @param filepath      In: Path to file
@@ -323,7 +293,7 @@ void read_inputs_from_file (const char * filepath, uint16_t * return_values)
    }
 
    // digital inputs
-   for (int i = 0; i < (APP_GSDML_INPUT_DATA_SIZE_BIT * 8); i++) {
+   for (int i = 0; i < (APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8); i++) {
       if (line[i*2] == '1') {
          digital_values += pow(2, 15-i);
       }
@@ -333,7 +303,7 @@ void read_inputs_from_file (const char * filepath, uint16_t * return_values)
    // analog inputs
    rewind(fp);
    read = getline(&line, &len, fp);
-   line += (APP_GSDML_INPUT_DATA_SIZE_BIT * 8 * 2);  // substring of digital portion
+   line += (APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8 * 2);  // substring of digital portion
    char *end = line;
    uint8_t comma_counter = 0;
    // APP_LOG_ERROR ("! Read line, analog values: %s", line);
@@ -344,7 +314,7 @@ void read_inputs_from_file (const char * filepath, uint16_t * return_values)
 			end++;
 		}
 
-      return_values[(APP_GSDML_INPUT_DATA_SIZE_BIT / 2) + read_values_count] = n;
+      return_values[(APP_GSDML_INPUT_DATA_SIZE_DIGITAL / 2) + read_values_count] = n;
       read_values_count++;
       line = end;
 
@@ -390,6 +360,69 @@ void update_heartbeat ()
    {
       write_heartbeat_to_file (app_args.path_heartbeat);
    }
+}
+
+void convert_uint16_to_bit_array (uint16_t value, bool * bits)
+{
+   uint16_t n = value;
+   
+   for (int i = 0; n > 0; i++)
+   {
+      bits[i] = n % 2;
+      n = n/2;
+   }
+}
+
+void app_set_output_state (uint16_t * output_state)
+{
+   FILE *fp;
+   fp = fopen(app_args.path_outputs_for_plexus, "w");
+
+   if (fp == NULL)
+   {
+      printf("! Error in writing output file (Plexus profinet inputs)");
+      exit(1);
+   }
+
+   // digital outputs
+   for (int i = 0; i < (APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL / 2); i++)
+   {
+      bool bits[APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL * 8] = {0};
+      convert_uint16_to_bit_array(output_state[i], bits);
+
+      for (int b = 0; b < APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL * 8; b++)
+      {
+         if (b == (APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL * 8) - 1)
+         {
+            fprintf(fp, "%d", bits[b]);
+         }
+         else
+         {
+            fprintf(fp, "%d,", bits[b]);
+         }
+      }
+   }
+
+   if (APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL > 0 && APP_GSDML_OUTPUT_DATA_SIZE_ANALOG > 0)
+   {
+      fprintf(fp, ",");
+   }
+
+   // analog outputs
+   for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE_ANALOG / 2; i++)
+   {
+      uint16_t current_value = output_state[(APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL / 2) + i];
+      if (i == (APP_GSDML_OUTPUT_DATA_SIZE_ANALOG / 2) - 1)
+      {
+         fprintf(fp, "%d", current_value);
+      }
+      else
+      {
+         fprintf(fp, "%d,", current_value);
+      }
+   }
+
+   fclose(fp);
 }
 
 void app_set_led (uint16_t id, bool led_state)
@@ -447,7 +480,7 @@ int app_pnet_cfg_init_storage (pnet_cfg_t * p_cfg, app_args_t * p_args)
       if (!pnal_does_file_exist (p_args->path_inputs_from_plexus))
       {
          printf (
-            "Error: The given input file for plexus inputs does not exist: %s\n",
+            "Error: The given input file of plexus outputs (pnet inputs) does not exist: %s\n",
             p_args->path_inputs_from_plexus);
          return -1;
       }
@@ -463,6 +496,18 @@ int app_pnet_cfg_init_storage (pnet_cfg_t * p_cfg, app_args_t * p_args)
          return -1;
       }
    }
+
+   if (p_args->path_outputs_for_plexus[0] != '\0')
+   {
+      if (!pnal_does_file_exist (p_args->path_outputs_for_plexus))
+      {
+         printf (
+            "Error: The given input file of plexus inputs (pnet outputs) does not exist: %s\n",
+            p_args->path_outputs_for_plexus);
+         return -1;
+      }
+   }
+
    return 0;
 }
 
@@ -498,6 +543,7 @@ int main (int argc, char * argv[])
    APP_LOG_INFO ("Max number of ports:  %u\n", PNET_MAX_PHYSICAL_PORTS);
    APP_LOG_INFO ("Network interfaces:   %s\n", app_args.eth_interfaces);
    APP_LOG_INFO ("Plexus outputs file:  %s\n", app_args.path_inputs_from_plexus);
+   APP_LOG_INFO ("Plexus inputs file:   %s\n", app_args.path_outputs_for_plexus);
    APP_LOG_INFO ("Heartbeat file:       %s\n", app_args.path_heartbeat);
    APP_LOG_INFO ("Default station name: %s\n", app_args.station_name);
 

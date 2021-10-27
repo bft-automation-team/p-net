@@ -51,6 +51,7 @@ typedef struct app_args
    bool factory_reset;
    bool remove_files;
    char path_inputs_from_plexus[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
+   char path_outputs_for_plexus[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
    char path_heartbeat[PNET_MAX_FILE_FULLPATH_SIZE]; /** Terminated string */
 } app_args_t;
 
@@ -122,6 +123,15 @@ pnet_t * app_get_pnet_instance (app_data_t * app);
  * @param led_state        In:    LED state. Use true for on and false for off.
  */
 void app_set_led (uint16_t id, bool led_state);
+
+/**
+ * Set output state
+ * Hardware specific. Implemented in sample app main file for
+ * each supported platform.
+ *
+ * @param output_state        In:    Output state
+ */
+void app_set_output_state (uint16_t * output_state);
 
 /**
  * Read button state
