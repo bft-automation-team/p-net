@@ -147,8 +147,8 @@ int app_data_set_output_data (
          memcpy (outputdata, data, size);    // outputdata comes from Codesys PNIO mapped OUTPUTS!
 
          for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE / 2; i++) {
-            data_for_plexus_input[i] = ((uint16_t)outputdata[i] << 8) | outputdata[i+1];
-            APP_LOG_DEBUG ("* value %d = %d \n", i, data_for_plexus_input[i]);
+            data_for_plexus_input[i] = ((uint16_t)data[(i * 2)] << 8) | data[(i * 2) + 1];
+            // APP_LOG_DEBUG ("* value %d = %d \n", i, data_for_plexus_input[i]);
             // if (i == 2) {
             //    uint16_t analog_output = data_for_plexus_input[i];
             //    APP_LOG_DEBUG ("* %d app_data_set_output_data => Output %d "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n", spec.tv_sec, i,

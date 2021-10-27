@@ -828,7 +828,6 @@ int pf_cpm_get_data_and_iops (
                os_mutex_lock (net->cpm_buf_lock);
                if (p_iodata->data_length > 0)
                {
-                  printf("ciao %d %d\n", p_iodata->data_length, p_iodata->data_offset);
                   memcpy (
                      p_data,
                      &p_buffer[p_iodata->data_offset],

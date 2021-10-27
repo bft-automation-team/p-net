@@ -120,8 +120,8 @@ typedef struct
 #define APP_GSDML_INPUT_DATA_SIZE_DIGITAL   2 /* bytes, for digital inputs data */
 #define APP_GSDML_INPUT_DATA_SIZE_ANALOG    (16 * 2) /* bytes, for analog inputs data */
 #define APP_GSDML_INPUT_DATA_SIZE           (APP_GSDML_INPUT_DATA_SIZE_DIGITAL + APP_GSDML_INPUT_DATA_SIZE_ANALOG) /* total bytes, for inputs data */
-#define APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL  1 /* bytes, for digital outputs data */
-#define APP_GSDML_OUTPUT_DATA_SIZE_ANALOG   (1 * 2) /* bytes, for analog outputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL  2 /* bytes, for digital outputs data */
+#define APP_GSDML_OUTPUT_DATA_SIZE_ANALOG   (16 * 2) /* bytes, for analog outputs data */
 #define APP_GSDML_OUTPUT_DATA_SIZE          (APP_GSDML_OUTPUT_DATA_SIZE_DIGITAL + APP_GSDML_OUTPUT_DATA_SIZE_ANALOG) /* total bytes, for outputs data */
 
 #define APP_GSDM_ALARM_PAYLOAD_SIZE         1 /* bytes */
