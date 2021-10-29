@@ -12,7 +12,7 @@ cmake --build build --target install
 ```
 
 Se si vuole cambiare la frequenza di aggiornamento di lettura/scrittura dei file (in pratica, accorci o allunghi il ciclo di esecuzione del main), agire su simple_app_common.h
-- APP_TICKS_READ_BUTTONS
+- APP_TICKS_READ_FILES
 - APP_TICKS_UPDATE_DATA
 
 ## CONFIGURARE LA BUILD

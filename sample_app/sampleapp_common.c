@@ -1495,7 +1495,7 @@ void app_loop_forever (void * arg)
          //    BYTE_TO_BINARY(flags>>24), BYTE_TO_BINARY(flags>>16), BYTE_TO_BINARY(flags>>8), BYTE_TO_BINARY(flags));
 
          app->read_inputs_tick_counter++;
-         if (app->read_inputs_tick_counter > APP_TICKS_READ_BUTTONS)
+         if (app->read_inputs_tick_counter > APP_TICKS_READ_FILES)
          {
             update_input_states (app);
             if (is_heartbeat_to_write) {
