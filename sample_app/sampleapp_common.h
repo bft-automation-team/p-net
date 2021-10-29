@@ -33,8 +33,8 @@ extern "C" {
 #define APP_MAIN_THREAD_PRIORITY  15
 #define APP_MAIN_THREAD_STACKSIZE 8192 /* bytes */
 
-#define APP_TICKS_READ_FILES 125     // 10
-#define APP_TICKS_UPDATE_DATA  125     // 100
+#define APP_TICKS_READ_FILES 200     // 10
+#define APP_TICKS_UPDATE_DATA  200     // 100
 
 typedef struct app_args
 {
