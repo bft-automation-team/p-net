@@ -1460,6 +1460,7 @@ void app_loop_forever (void * arg)
    uint32_t mask = APP_EVENT_READY_FOR_DATA | APP_EVENT_TIMER |
                    APP_EVENT_ALARM | APP_EVENT_ABORT;
    uint32_t flags = 0;
+   bool is_heartbeat_to_write = false;
 
    app->main_api.arep = UINT32_MAX;
 
@@ -1476,6 +1477,9 @@ void app_loop_forever (void * arg)
          os_event_clr (app->main_events, APP_EVENT_READY_FOR_DATA);
 
          app_handle_send_application_ready (app->net, app->arep_for_appl_ready);
+         // APP_LOG_DEBUG("flags & APP_EVENT_READY_FOR_DATA\n");
+         // os_usleep(1000 * 100);
+         is_heartbeat_to_write = true;
       }
       else if (flags & APP_EVENT_ALARM)
       {
@@ -1489,12 +1493,18 @@ void app_loop_forever (void * arg)
       else if (flags & APP_EVENT_TIMER)
       {
          os_event_clr (app->main_events, APP_EVENT_TIMER);
+         // APP_LOG_DEBUG("flags & APP_EVENT_TIMER\n");
+         // os_usleep(1000 * 100);
+         // APP_LOG_DEBUG ("Flags => "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" (%d)\n",
+         //    BYTE_TO_BINARY(flags>>24), BYTE_TO_BINARY(flags>>16), BYTE_TO_BINARY(flags>>8), BYTE_TO_BINARY(flags));
 
          app->read_inputs_tick_counter++;
          if (app->read_inputs_tick_counter > APP_TICKS_READ_BUTTONS)
          {
             update_input_states (app);
-            update_heartbeat ();
+            if (is_heartbeat_to_write) {
+               update_heartbeat ();
+            }
             app->read_inputs_tick_counter = 0;
          }
          
@@ -1523,6 +1533,7 @@ void app_loop_forever (void * arg)
          app->alarm_allowed = true;
          APP_LOG_DEBUG ("Connection closed\n");
          APP_LOG_DEBUG ("Waiting for PLC connect request\n\n");
+         is_heartbeat_to_write = false;
       }
    }
 }
