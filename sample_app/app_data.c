@@ -66,7 +66,9 @@ static void app_handle_output (uint16_t * output_data)
    for (int i = 0; i < APP_GSDML_OUTPUT_DATA_SIZE / 2; i++) {
       if (output_data[i] != previous_output_state[i]) {
          app_set_output_state(output_data);
-         memcpy(previous_output_state, output_data, APP_GSDML_OUTPUT_DATA_SIZE / 2);
+         for (int j = 0; j < APP_GSDML_OUTPUT_DATA_SIZE / 2; j++) {
+            previous_output_state[j] = output_data[j];
+         }
          return;
       }
    }

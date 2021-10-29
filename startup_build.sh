@@ -31,7 +31,7 @@ fi
 
 sudo chmod -R 777 /var/www/plexus_pnet_data
 
-base_pnet_executable_path_dir=/var/www/html/plexus/system/loops
+base_pnet_executable_path_dir=/home/automation-dell/profinet/build
 
 cd $base_pnet_executable_path_dir
-sudo "$base_pnet_executable_path_dir/pnet" -vvvvv -i enp7s0 -a "$base_file_path_dir/$output_filename" -b "$base_file_path_dir/$heartbeat_filename" -c "$base_file_path_dir/$input_filename"
+sudo "$base_pnet_executable_path_dir/pn_dev" -vvvvv -i enp7s0 -a "$base_file_path_dir/$output_filename" -b "$base_file_path_dir/$heartbeat_filename" -c "$base_file_path_dir/$input_filename"
