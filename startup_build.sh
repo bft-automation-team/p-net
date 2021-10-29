@@ -1,9 +1,9 @@
 #!/bin/sh
 
-base_file_path_dir=/var/www/plexus_pnet_data
+base_file_path_dir=/var/www/plexus_db/pnet_data
 
 if [ ! -d "$base_file_path_dir" ]; then
-	sudo mkdir /var/www/plexus_pnet_data
+	sudo mkdir /var/www/plexus_db/pnet_data
 	echo "Created folder $base_file_path_dir"
 fi
 
@@ -29,7 +29,7 @@ if [ ! -f "$base_file_path_dir/$input_filename" ]; then
 fi
 
 
-sudo chmod -R 777 /var/www/plexus_pnet_data
+sudo chmod -R 777 /var/www/plexus_db/pnet_data
 
 base_pnet_executable_path_dir=/home/automation-dell/profinet/build
 
