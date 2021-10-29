@@ -444,14 +444,6 @@ static int app_reset_ind (
    return 0;
 }
 
-static int app_signal_led_ind (pnet_t * net, void * arg, bool led_state)
-{
-   APP_LOG_INFO ("Profinet signal LED indication. New state: %u\n", led_state);
-
-   app_set_led (APP_PROFINET_SIGNAL_LED_ID, led_state);
-   return 0;
-}
-
 static int app_exp_module_ind (
    pnet_t * net,
    void * arg,
@@ -1452,7 +1444,7 @@ void app_pnet_cfg_init_default (pnet_cfg_t * pnet_cfg)
    pnet_cfg->alarm_cnf_cb = app_alarm_cnf;
    pnet_cfg->alarm_ack_cnf_cb = app_alarm_ack_cnf;
    pnet_cfg->reset_cb = app_reset_ind;
-   pnet_cfg->signal_led_cb = app_signal_led_ind;
+   pnet_cfg->signal_led_cb = NULL;
 
    pnet_cfg->cb_arg = (void *)&app_state;
 }

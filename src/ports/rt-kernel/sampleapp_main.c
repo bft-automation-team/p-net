@@ -53,18 +53,6 @@ void app_set_output_state (uint16_t * output_state)
    printf ("! NOT IMPLEMENTED: \n");
 }
 
-void app_set_led (uint16_t id, bool led_state)
-{
-   if (id == APP_DATA_LED_ID)
-   {
-      gpio_set (GPIO_LED1, led_state ? 1 : 0); /* "LED1" on circuit board */
-   }
-   else if (id == APP_PROFINET_SIGNAL_LED_ID)
-   {
-      gpio_set (GPIO_LED2, led_state ? 1 : 0); /* "LED2" on circuit board */
-   }
-}
-
 bool app_get_button (uint16_t id)
 {
    if (id == 0)

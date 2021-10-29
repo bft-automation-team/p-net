@@ -425,38 +425,6 @@ void app_set_output_state (uint16_t * output_state)
    fclose(fp);
 }
 
-void app_set_led (uint16_t id, bool led_state)
-{
-   /* Important:
-    * The Linux sample application uses a script to set the LED state,
-    * for easy adaption to different development boards.
-    *
-    * The script typically writes to files in the /sys directory to set LED
-    * state via GPIO operations. If you do not have any physical LEDs you can
-    * use a script that writes to regular files instead.
-    *
-    * However, file operations shall be avoided within the main task
-    * in a real application. File operations may affect the timing of the
-    * Profinet communication depending on file system implementation.
-    */
-
-   char id_str[7] = {0}; /** Terminated string */
-   const char * argv[4];
-
-   sprintf (id_str, "%u", id);
-   id_str[sizeof (id_str) - 1] = '\0';
-
-   argv[0] = "set_profinet_leds";
-   argv[1] = (char *)&id_str;
-   argv[2] = (led_state == 1) ? "1" : "0";
-   argv[3] = NULL;
-
-   if (pnal_execute_script (argv) != 0)
-   {
-      printf ("Failed to set LED state\n");
-   }
-}
-
 int app_pnet_cfg_init_storage (pnet_cfg_t * p_cfg, app_args_t * p_args)
 {
    strcpy (p_cfg->file_directory, p_args->path_storage_directory);
