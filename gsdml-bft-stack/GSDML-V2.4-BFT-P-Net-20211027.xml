@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<ISO15745Profile xmlns="http://www.profibus.com/GSDML/2003/11/DeviceProfile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.profibus.com/GSDML/2003/11/DeviceProfile ..\xsd\GSDML-DeviceProfile-V2.4.xsd">
+   <!-- ProfileHeader definition as defined in ISO 15745-1. Please do not change the content. -->
+   <ProfileHeader>
+      <ProfileIdentification>PROFINET Device Profile</ProfileIdentification>
+      <ProfileRevision>1.00</ProfileRevision>
+      <ProfileName>Device Profile for PROFINET Devices</ProfileName>
+      <ProfileSource>PROFIBUS Nutzerorganisation e. V. (PNO)</ProfileSource>
+      <ProfileClassID>Device</ProfileClassID>
+      <ISO15745Reference>
+         <ISO15745Part>4</ISO15745Part>
+         <ISO15745Edition>1</ISO15745Edition>
+         <ProfileTechnology>GSDML</ProfileTechnology>
+      </ISO15745Reference>
+   </ProfileHeader>
+   <ProfileBody>
+      <DeviceIdentity VendorID="0xfeed" DeviceID="0xff01">
+         <InfoText TextId="IDT_INFO_Device"/>
+         <VendorName Value="RT-Labs"/>
+      </DeviceIdentity>
+      <DeviceFunction>
+         <Family MainFamily="I/O" ProductFamily="P-Net Extended Sample Test"/>
+      </DeviceFunction>
+      <ApplicationProcess>
+         <DeviceAccessPointList>
+            <DeviceAccessPointItem ID="IDD_1" PNIO_Version="V2.4" PhysicalSlots="0..4" ModuleIdentNumber="0x00000001" MinDeviceInterval="32" DNS_CompatibleName="bft-pnet-device"
+               FixedInSlots="0" ObjectUUID_LocalIndex="1" DeviceAccessSupported="false" MultipleWriteSupported="true" CheckDeviceID_Allowed="true" NameOfStationNotTransferable="false" LLDP_NoD_Supported="true" ResetToFactoryModes="1..2">
+               <ModuleInfo>
+                  <Name TextId="IDT_MODULE_NAME_DAP1"/>
+                  <InfoText TextId="IDT_INFO_DAP1"/>
+                  <VendorName Value="RT-Labs"/>
+                  <OrderNumber Value="1"/>
+                  <HardwareRelease Value="A1.0"/>
+                  <SoftwareRelease Value="V0.1.0"/>
+               </ModuleInfo>
+               <CertificationInfo ConformanceClass="B" ApplicationClass="" NetloadClass="I"/>
+               <IOConfigData MaxInputLength="244" MaxOutputLength="244"/>
+               <UseableModules>
+                  <ModuleItemRef ModuleItemTarget="IDM_33" AllowedInSlots="1..4"/>
+               </UseableModules>
+               <VirtualSubmoduleList>
+                  <VirtualSubmoduleItem ID="IDS_1" SubmoduleIdentNumber="0x00000001" Writeable_IM_Records="1 2 3" MayIssueProcessAlarm="false">
+                     <IOData/>
+                     <ModuleInfo>
+                        <Name TextId="IDT_MODULE_NAME_DAP1"/>
+                        <InfoText TextId="IDT_INFO_DAP1"/>
+                     </ModuleInfo>
+                  </VirtualSubmoduleItem>
+               </VirtualSubmoduleList>
+               <SystemDefinedSubmoduleList>
+                  <InterfaceSubmoduleItem ID="IDS_I" SubmoduleIdentNumber="0x00008000" SubslotNumber="32768" TextId="IDT_NAME_IS" SupportedRT_Classes="RT_CLASS_1" SupportedProtocols="SNMP;LLDP" NetworkComponentDiagnosisSupported="false"
+                     PTP_BoundarySupported="true" DCP_BoundarySupported="true">
+                     <ApplicationRelations StartupMode="Advanced">
+                        <TimingProperties SendClock="32" ReductionRatio="1 2 4 8 16 32 64 128 256 512"/>
+                     </ApplicationRelations>
+                  </InterfaceSubmoduleItem>
+                  <PortSubmoduleItem ID="IDS_P1" SubmoduleIdentNumber="0x00008001" SubslotNumber="32769" TextId="IDT_NAME_PS1" MaxPortRxDelay="350" MaxPortTxDelay="160">
+                     <MAUTypeList>
+                        <!--
+MAUTypeItems shall match the actual network interfaces of the device.
+Current list works for Raspberry Pi, Linksys usb/ethernet dongle and xmc sample targets
+-->
+                        <MAUTypeItem Value="30"/>
+                        <MAUTypeItem Value="16"/>
+                        <MAUTypeItem Value="5"/>
+                     </MAUTypeList>
+                  </PortSubmoduleItem>
+                  <!--
+Enable to support additional port. (PNET_MAX_PHYSICAL_PORTS == 2)
+Add additional PortSubmoduleItems to support additional ports
+-->
+                  <!--
+                  <PortSubmoduleItem ID="IDS_P2" SubmoduleIdentNumber="0x00008002" SubslotNumber="32770" TextId="IDT_NAME_PS2" MaxPortRxDelay="350" MaxPortTxDelay="160">
+                     <MAUTypeList>
+                        <MAUTypeItem Value="30"/>
+                        <MAUTypeItem Value="16"/>
+                        <MAUTypeItem Value="5"/>
+                     </MAUTypeList>
+                  </PortSubmoduleItem>
+-->
+               </SystemDefinedSubmoduleList>
+               <Graphics>
+                  <GraphicItemRef Type="DeviceSymbol" GraphicItemTarget="RT-LabsStackImage" />
+               </Graphics>
+            </DeviceAccessPointItem>
+         </DeviceAccessPointList>
+         <ModuleList>
+            <!--  ModuleIdentNumber must match app_gsdml.h APP_GSDML_MOD_ID_8_8_DIGITAL_IN_OUT
+            -->
+            <ModuleItem ID="IDM_33" ModuleIdentNumber="0x00000033">
+               <ModuleInfo>
+                  <Name TextId="TOK_Name_Module_I32O32"/>
+                  <InfoText TextId="TOK_InfoText_Module_I32O32"/>
+                  <HardwareRelease Value="1.0"/>
+                  <SoftwareRelease Value="1.0"/>
+               </ModuleInfo>
+               <VirtualSubmoduleList>
+                  <!--  SubmoduleIdentNumber must match app_gsdml.h APP_GSDML_SUBMOD_ID_DIGITAL_IN_OUT -->
+                  <VirtualSubmoduleItem ID="IDSM_133" SubmoduleIdentNumber="0x0133" MayIssueProcessAlarm="true">
+                     <IOData>
+                        <Input>
+                           <!-- The total length of data items must be equal to app_gsdml.h APP_GSDML_INPUT_DATA_SIZE -->
+                           <DataItem DataType="Unsigned16" UseAsBits="true" TextId="TOK_Input_DataItem_16">
+                              <BitDataItem BitOffset="0" TextId="TOK_Input_DataItem_Bit0"/>
+                              <BitDataItem BitOffset="1" TextId="TOK_Input_DataItem_Bit1"/>
+                              <BitDataItem BitOffset="2" TextId="TOK_Input_DataItem_Bit2"/>
+                              <BitDataItem BitOffset="3" TextId="TOK_Input_DataItem_Bit3"/>
+                              <BitDataItem BitOffset="4" TextId="TOK_Input_DataItem_Bit4"/>
+                              <BitDataItem BitOffset="5" TextId="TOK_Input_DataItem_Bit5"/>
+                              <BitDataItem BitOffset="6" TextId="TOK_Input_DataItem_Bit6"/>
+                              <BitDataItem BitOffset="7" TextId="TOK_Input_DataItem_Bit7"/>
+                              <BitDataItem BitOffset="8" TextId="TOK_Input_DataItem_Bit8"/>
+                              <BitDataItem BitOffset="9" TextId="TOK_Input_DataItem_Bit9"/>
+                              <BitDataItem BitOffset="10" TextId="TOK_Input_DataItem_Bit10"/>
+                              <BitDataItem BitOffset="11" TextId="TOK_Input_DataItem_Bit11"/>
+                              <BitDataItem BitOffset="12" TextId="TOK_Input_DataItem_Bit12"/>
+                              <BitDataItem BitOffset="13" TextId="TOK_Input_DataItem_Bit13"/>
+                              <BitDataItem BitOffset="14" TextId="TOK_Input_DataItem_Bit14"/>
+                              <BitDataItem BitOffset="15" TextId="TOK_Input_DataItem_Bit15"/>
+                           </DataItem>
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Input_DataItem_Unsigned16" />
+                        </Input>
+                        <Output Consistency="All items consistency">
+                           <!-- The total length of data items must be equal to app_gsdml.h APP_GSDML_OUTPUT_DATA_SIZE -->
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_16" UseAsBits="true">
+                              <!--  DataType must be one of [Unsigned8, Unsigned16, Unsigned32, Unsigned64, Float32, Integer8,
+                                       Date, VisibleString, Boolean, TimeStamp]
+                                    UseAsBits="true" is used when individual bits are to be displayed in the configuration tool (Codesys) -->
+                              <BitDataItem BitOffset="0" TextId="TOK_Output_DataItem_Bit0"/>
+                              <BitDataItem BitOffset="1" TextId="TOK_Output_DataItem_Bit1"/>
+                              <BitDataItem BitOffset="2" TextId="TOK_Output_DataItem_Bit2"/>
+                              <BitDataItem BitOffset="3" TextId="TOK_Output_DataItem_Bit3"/>
+                              <BitDataItem BitOffset="4" TextId="TOK_Output_DataItem_Bit4"/>
+                              <BitDataItem BitOffset="5" TextId="TOK_Output_DataItem_Bit5"/>
+                              <BitDataItem BitOffset="6" TextId="TOK_Output_DataItem_Bit6"/>
+                              <BitDataItem BitOffset="7" TextId="TOK_Output_DataItem_Bit7"/>
+                              <BitDataItem BitOffset="8" TextId="TOK_Output_DataItem_Bit8"/>
+                              <BitDataItem BitOffset="9" TextId="TOK_Output_DataItem_Bit9"/>
+                              <BitDataItem BitOffset="10" TextId="TOK_Output_DataItem_Bit10"/>
+                              <BitDataItem BitOffset="11" TextId="TOK_Output_DataItem_Bit11"/>
+                              <BitDataItem BitOffset="12" TextId="TOK_Output_DataItem_Bit12"/>
+                              <BitDataItem BitOffset="13" TextId="TOK_Output_DataItem_Bit13"/>
+                              <BitDataItem BitOffset="14" TextId="TOK_Output_DataItem_Bit14"/>
+                              <BitDataItem BitOffset="15" TextId="TOK_Output_DataItem_Bit15"/>
+                           </DataItem>
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                           <DataItem DataType="Unsigned16" TextId="TOK_Output_DataItem_Unsigned16" />
+                        </Output>
+                     </IOData>
+                     <RecordDataList>
+                        <!--  Unsigned on N bits == [0; 2^N - 1] == Every bit is taken with its positive value
+                              1000 0000 = 128
+                              1111 1111 = 255
+
+                              Signed on N bits == [-2^(N-1) - 1; 2^(N-1)] == MSB (Most Significant Bit) is taken with negative value
+                              1000 0000 = -128
+                              1111 1111 = -1
+                              0111 1111 = 127 -->
+
+                        <!--  Index must match app_gsdml.h APP_GSDM_PARAMETER_1_IDX
+                              Length must match app_gsdml.h APP_GSDM_PARAMETER_LENGTH
+                              DataType must be one of [Unsigned8, Unsigned16, Unsigned32, Unsigned64, Float32, Integer8, Date, VisibleString, Boolean, TimeStamp]
+                        -->
+                        <ParameterRecordDataItem Index="3" Length="4">
+                           <Name TextId="TOK_configuration_1"/>
+                           <Ref DataType="Unsigned32" ByteOffset="0" DefaultValue="1" AllowedValues="0..4294967295‬" Changeable="true" Visible="true" TextId="T_ID_PARAM_1_INFO"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="4" Length="4">
+                           <Name TextId="TOK_configuration_2"/>
+                           <Ref DataType="Unsigned16" ByteOffset="0" DefaultValue="2" AllowedValues="0..65535" Changeable="true" Visible="true" TextId="T_ID_PARAM_2_INFO"/>
+                           <Ref DataType="Unsigned8" ByteOffset="2" DefaultValue="3" AllowedValues="0..255" Changeable="true" Visible="true" TextId="T_ID_PARAM_3_INFO"/>
+                           <Ref DataType="Integer8" ByteOffset="3" DefaultValue="4" AllowedValues="-128..127" Changeable="true" Visible="true" TextId="T_ID_PARAM_4_INFO"/>
+                        </ParameterRecordDataItem>
+                     </RecordDataList>
+                     <ModuleInfo>
+                        <Name TextId="TOK_Name_Module_I32O32"/>
+                        <InfoText TextId="TOK_InfoText_Module_I32O32"/>
+                     </ModuleInfo>
+                  </VirtualSubmoduleItem>
+               </VirtualSubmoduleList>
+            </ModuleItem>
+         </ModuleList>
+         <LogBookEntryList>
+            <LogBookEntryItem Status="2130510">
+               <!--Custom log book entry for sample application-->
+               <!--Error code 0x20  Error decode 0x82  Error code 1 0x4E-->
+               <ErrorCode2Value>
+                  <Name TextId="IDT_CUSTOM_LOGBOOK_1"/>
+               </ErrorCode2Value>
+            </LogBookEntryItem>
+         </LogBookEntryList>
+         <GraphicsList>
+            <GraphicItem ID="RT-LabsStackImage" GraphicFile="GSDML-BFT-STACK" />
+         </GraphicsList>
+         <ExternalTextList>
+            <PrimaryLanguage>
+               <Text TextId="IDT_INFO_Device" Value="https://github.com/rtlabs-com/p-net"/>
+               <Text TextId="IDT_MODULE_NAME_DAP1" Value="P-Net BFT Extended Sample"/>
+               <Text TextId="IDT_INFO_DAP1" Value="Profinet device sample app https://github.com/rtlabs-com/p-net"/>
+               <Text TextId="IDT_CUSTOM_DIAG_1" Value="Custom diagnosis in USI format"/>
+               <Text TextId="IDT_CUSTOM_DIAG_1_VALUE" Value="Custom diagnosis value"/>
+               <Text TextId="IDT_CUSTOM_LOGBOOK_1" Value="Custom Logbook entry"/>
+
+               <Text TextId="IDT_NAME_IS" Value="X1"/>
+               <Text TextId="IDT_NAME_PS1" Value="X1 P1"/>
+               <Text TextId="IDT_NAME_PS2" Value="X1 P2"/>
+               <!--module name-->
+               <Text TextId="TOK_Name_Module_I32O32" Value="A/D-I/O 32x32"/>
+               <!--module info -->
+               <Text TextId="TOK_InfoText_Module_I32O32" Value="Analog/Digital In/Out 32x32"/>
+               <!--dataitem name-->
+               <Text TextId="TOK_Input_DataItem_16" Value="Input 16 bits"/>
+               <Text TextId="TOK_Output_DataItem_16" Value="Output 16 bits"/>
+               <Text TextId="TOK_Input_DataItem_Unsigned16" Value="Input U16"/>
+               <Text TextId="TOK_Output_DataItem_Unsigned16" Value="Output U16"/>
+
+               <Text TextId="TOK_Input_DataItem_Bit0" Value="Input Bit 0"/>
+               <Text TextId="TOK_Input_DataItem_Bit1" Value="Input Bit 1"/>
+               <Text TextId="TOK_Input_DataItem_Bit2" Value="Input Bit 2"/>
+               <Text TextId="TOK_Input_DataItem_Bit3" Value="Input Bit 3"/>
+               <Text TextId="TOK_Input_DataItem_Bit4" Value="Input Bit 4"/>
+               <Text TextId="TOK_Input_DataItem_Bit5" Value="Input Bit 5"/>
+               <Text TextId="TOK_Input_DataItem_Bit6" Value="Input Bit 6"/>
+               <Text TextId="TOK_Input_DataItem_Bit7" Value="Input Bit 7"/>
+               <Text TextId="TOK_Input_DataItem_Bit8" Value="Input Bit 8"/>
+               <Text TextId="TOK_Input_DataItem_Bit9" Value="Input Bit 9"/>
+               <Text TextId="TOK_Input_DataItem_Bit10" Value="Input Bit 10"/>
+               <Text TextId="TOK_Input_DataItem_Bit11" Value="Input Bit 11"/>
+               <Text TextId="TOK_Input_DataItem_Bit12" Value="Input Bit 12"/>
+               <Text TextId="TOK_Input_DataItem_Bit13" Value="Input Bit 13"/>
+               <Text TextId="TOK_Input_DataItem_Bit14" Value="Input Bit 14"/>
+               <Text TextId="TOK_Input_DataItem_Bit15" Value="Input Bit 15"/>
+
+               <Text TextId="TOK_Output_DataItem_Bit0" Value="Output Bit 0"/>
+               <Text TextId="TOK_Output_DataItem_Bit1" Value="Output Bit 1"/>
+               <Text TextId="TOK_Output_DataItem_Bit2" Value="Output Bit 2"/>
+               <Text TextId="TOK_Output_DataItem_Bit3" Value="Output Bit 3"/>
+               <Text TextId="TOK_Output_DataItem_Bit4" Value="Output Bit 4"/>
+               <Text TextId="TOK_Output_DataItem_Bit5" Value="Output Bit 5"/>
+               <Text TextId="TOK_Output_DataItem_Bit6" Value="Output Bit 6"/>
+               <Text TextId="TOK_Output_DataItem_Bit7" Value="Output Bit 7"/>
+               <Text TextId="TOK_Output_DataItem_Bit8" Value="Output Bit 8"/>
+               <Text TextId="TOK_Output_DataItem_Bit9" Value="Output Bit 9"/>
+               <Text TextId="TOK_Output_DataItem_Bit10" Value="Output Bit 10"/>
+               <Text TextId="TOK_Output_DataItem_Bit11" Value="Output Bit 11"/>
+               <Text TextId="TOK_Output_DataItem_Bit12" Value="Output Bit 12"/>
+               <Text TextId="TOK_Output_DataItem_Bit13" Value="Output Bit 13"/>
+               <Text TextId="TOK_Output_DataItem_Bit14" Value="Output Bit 14"/>
+               <Text TextId="TOK_Output_DataItem_Bit15" Value="Output Bit 15"/>
+
+               <!--ParameterRecordDataItem name-->
+               <Text TextId="TOK_configuration_1" Value="General configuration 1"/>
+               <Text TextId="TOK_configuration_2" Value="Configuration 2"/>
+               <Text TextId="T_ID_PARAM_1_INFO" Value="Parameter 1 (32bit unsigned)"/>
+               <Text TextId="T_ID_PARAM_2_INFO" Value="Parameter 2 (16bit unsigned)"/>
+               <Text TextId="T_ID_PARAM_3_INFO" Value="Parameter 3 (8bit unsigned)"/>
+               <Text TextId="T_ID_PARAM_4_INFO" Value="Parameter 4 (8bit signed)"/>
+            </PrimaryLanguage>
+         </ExternalTextList>
+      </ApplicationProcess>
+   </ProfileBody>
+</ISO15745Profile>
