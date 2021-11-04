@@ -1,9 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 base_file_path_dir=/dev/shm
 
 if [ ! -d "$base_file_path_dir" ]; then
-	sudo mkdir $base_file_path_dir
 	echo "Created folder $base_file_path_dir"
 fi
 
@@ -27,9 +26,6 @@ if [ ! -f "$base_file_path_dir/$input_filename" ]; then
         echo "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" | sudo tee "$base_file_path_dir/$input_filename"
         echo "Created file $base_file_path_dir/$input_filename"
 fi
-
-
-sudo chmod -R 777 /var/www/plexus_db/pnet_data
 
 base_pnet_executable_path_dir=/home/automation-dell/profinet/build
 
