@@ -305,7 +305,6 @@ void read_inputs_from_file (const char * filepath, uint16_t * return_values)
    read = getline(&line, &len, fp);
    line += (APP_GSDML_INPUT_DATA_SIZE_DIGITAL * 8 * 2);  // substring of digital portion
    char *end = line;
-   uint8_t comma_counter = 0;
    // APP_LOG_ERROR ("! Read line, analog values: %s", line);
 
 	while(*end) {

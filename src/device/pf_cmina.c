@@ -366,11 +366,11 @@ int pf_cmina_set_default_cfg (pnet_t * net, uint16_t reset_mode)
 
 void pf_cmina_dcp_set_commit (pnet_t * net)
 {
-   int res = 0;
+   // int res = 0;
    char ip_string[PNAL_INET_ADDRSTR_SIZE] = {0};      /** Terminated string */
    char netmask_string[PNAL_INET_ADDRSTR_SIZE] = {0}; /** Terminated string */
    char gateway_string[PNAL_INET_ADDRSTR_SIZE] = {0}; /** Terminated string */
-   bool permanent = true;
+   // bool permanent = true;
 
    if (net->cmina_commit_ip_suite == true)
    {
@@ -380,14 +380,14 @@ void pf_cmina_dcp_set_commit (pnet_t * net)
             &net->cmina_nonvolatile_dcp_ase.full_ip_suite.ip_suite,
             sizeof (pf_ip_suite_t)) != 0)
       {
-         permanent = false;
+         // permanent = false;
       }
       else if (
          strcmp (
             net->cmina_current_dcp_ase.station_name,
             net->cmina_nonvolatile_dcp_ase.station_name) != 0)
       {
-         permanent = false;
+         // permanent = false;
       }
 
       pf_cmina_ip_to_string (

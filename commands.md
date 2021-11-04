@@ -33,6 +33,13 @@ ma, se necessario, a fini di debug, test su prestazioni Linux, ecc... va rifatta
 cmake -B build -S p-net -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DUSE_SCHED_FIFO=ON
 ```
 
+Oppure, configurare una build x produzione
+
+```
+cmake -B build -S p-net -DCMAKE_BUILD_TYPE=Release
+cp build/pn_dev /var/www/html/plexus/system/loops/pnet
+```
+
 
 # RUNNING THE PNET STACK
 

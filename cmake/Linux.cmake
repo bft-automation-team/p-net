@@ -49,13 +49,10 @@ target_compile_options(profinet
   -Wextra
   -Werror
   -Wno-unused-parameter
-  -Wno-unused-variable
-  -Wno-unused-but-set-variable
   -ffunction-sections
   -fdata-sections
   INTERFACE
   $<$<CONFIG:Coverage>:--coverage>
-  -Wno-unused-function
   )
 
 target_link_libraries(profinet
@@ -90,10 +87,6 @@ target_compile_options(pn_dev
   -Wno-unused-parameter
   -ffunction-sections
   -fdata-sections
-  -fno-stack-protector
-  -Wno-unused-variable
-  -Wno-unused-but-set-variable
-  -Wno-unused-function
   )
 
 target_link_options(pn_dev

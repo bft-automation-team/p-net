@@ -73,8 +73,7 @@ extern "C" {
 #define APP_GSDML_LOGBOOK_ERROR_CODE_2 0x00       /* Manufacturer specific */
 #define APP_GSDML_LOGBOOK_ENTRY_DETAIL 0xFEE1DEAD /* Manufacturer specific */
 
-#define APP_GSDM_PARAMETER_1_IDX  1
-#define APP_GSDM_PARAMETER_2_IDX  2
+#define APP_GSDM_PARAMETER_IDX  123
 #define APP_GSDM_PARAMETER_LENGTH 4
 
 typedef struct cfg_module

@@ -114,8 +114,7 @@ typedef struct app_data_for_testing_obj
    os_event_t * main_events;
    uint32_t main_arep;
    bool alarm_allowed;
-   uint32_t app_param_1;
-   uint32_t app_param_2;
+   uint32_t app_param;
    uint8_t inputdata[TEST_DATASIZE_INPUT];
    uint8_t custom_input_slots[PNET_MAX_SLOTS];
    uint8_t custom_output_slots[PNET_MAX_SLOTS];

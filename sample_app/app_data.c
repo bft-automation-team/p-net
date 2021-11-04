@@ -32,8 +32,7 @@
 /* Parameters data
  * Todo: Data is always in pnio data format. Add conversion to uint32_t.
  */
-uint32_t app_param_1 = 0;
-uint32_t app_param_2 = 0;
+uint32_t app_param = 0;
 
 /* Process data */
 uint8_t inputdata[APP_GSDML_INPUT_DATA_SIZE] = {0};
@@ -202,13 +201,9 @@ int app_data_write_parameter (
       return -1;
    }
 
-   if (index == APP_GSDM_PARAMETER_1_IDX)
+   if (index == APP_GSDM_PARAMETER_IDX)
    {
-      memcpy (&app_param_1, data, sizeof (length));
-   }
-   else if (index == APP_GSDM_PARAMETER_2_IDX)
-   {
-      memcpy (&app_param_2, data, sizeof (length));
+      memcpy (&app_param, data, sizeof (length));
    }
    APP_LOG_DEBUG ("  Writing %s\n", par_cfg->name);
    app_log_print_bytes (APP_LOG_LEVEL_DEBUG, data, length);
@@ -247,15 +242,10 @@ int app_data_read_parameter (
    }
 
    APP_LOG_DEBUG ("  Reading %s\n", par_cfg->name);
-   if (index == APP_GSDM_PARAMETER_1_IDX)
+   if (index == APP_GSDM_PARAMETER_IDX)
    {
-      *data = (uint8_t *)&app_param_1;
-      *length = sizeof (app_param_1);
-   }
-   else if (index == APP_GSDM_PARAMETER_2_IDX)
-   {
-      *data = (uint8_t *)&app_param_2;
-      *length = sizeof (app_param_2);
+      *data = (uint8_t *)&app_param;
+      *length = sizeof (app_param);
    }
 
    app_log_print_bytes (APP_LOG_LEVEL_DEBUG, *data, *length);
